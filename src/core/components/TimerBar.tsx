@@ -1,4 +1,4 @@
-import { colors, radius } from "@/core/theme";
+import { colors, radius, spacing } from "@/core/theme";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, {
@@ -9,21 +9,22 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-type Props = { progress: number }; // 1 = full, 0 = empty
+type Props = { progress: number };
 
 export function TimerBar({ progress }: Props) {
-  const p = useSharedValue(progress);
+  const value = useSharedValue(progress);
 
   useEffect(() => {
-    // Linear easing makes it drain at a steady speed, like a real timer
-    p.value = withTiming(progress, { duration: 1000, easing: Easing.linear });
-  }, [progress, p]);
+    value.value = withTiming(progress, {
+      duration: 1000,
+      easing: Easing.linear,
+    });
+  }, [progress, value]);
 
-  const style = useAnimatedStyle(() => ({
-    width: `${p.value * 100}%`,
-    // Color shifts teal -> orange -> red as time runs out
+  const fillStyle = useAnimatedStyle(() => ({
+    width: `${value.value * 100}%`,
     backgroundColor: interpolateColor(
-      p.value,
+      value.value,
       [0, 0.3, 1],
       [colors.red, colors.orange, colors.teal],
     ),
@@ -31,14 +32,14 @@ export function TimerBar({ progress }: Props) {
 
   return (
     <View style={styles.track}>
-      <Animated.View style={[styles.fill, style]} />
+      <Animated.View style={[styles.fill, fillStyle]} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   track: {
-    height: 12,
+    height: spacing.md,
     backgroundColor: colors.card,
     borderRadius: radius.pill,
     overflow: "hidden",

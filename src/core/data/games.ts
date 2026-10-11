@@ -32,7 +32,7 @@ export const games: GameInfo[] = [
     emoji: "🧠",
     route: "/games/quiz",
     gradient: gradients.primary,
-    ready: false,
+    ready: true,
   },
   {
     id: "slidingPuzzle",

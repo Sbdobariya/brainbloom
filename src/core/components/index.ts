@@ -6,4 +6,5 @@ export { GradientButton } from "./GradientButton";
 export { PressableScale } from "./PressableScale";
 export * from "./ResultModal";
 export * from "./StatChip";
+export { TimerBar } from "./TimerBar";
 

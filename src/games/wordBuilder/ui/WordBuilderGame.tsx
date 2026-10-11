@@ -5,6 +5,7 @@ import {
   StatChip,
 } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
+import { TimerBar } from "@/core/components/TimerBar";
 import { colors, gradients, radius, spacing, typography } from "@/core/theme";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
@@ -20,7 +21,6 @@ import {
 } from "../logic/wordBuilder";
 import { AnswerSlots, type RoundStatus } from "./AnswerSlots";
 import { LetterTile } from "./LetterTile";
-import { TimerBar } from "./TimerBar";
 
 const ROUNDS = 5;
 const SECONDS_PER_ROUND = 30;
