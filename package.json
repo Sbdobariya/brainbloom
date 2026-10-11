@@ -7,6 +7,7 @@
     "@shopify/react-native-skia": "2.6.2",
     "expo": "~57.0.27",
     "expo-audio": "~57.0.5",
+    "expo-build-properties": "~57.0.22",
     "expo-constants": "~57.0.21",
     "expo-device": "~57.0.2",
     "expo-font": "~57.0.4",
@@ -40,7 +41,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --dev-client",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
