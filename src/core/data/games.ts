@@ -56,6 +56,6 @@ export const games: GameInfo[] = [
     emoji: "🌊",
     route: "/games/free-flow",
     gradient: [colors.purple, colors.pink],
-    ready: false,
+    ready: true,
   },
 ];
