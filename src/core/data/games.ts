@@ -40,7 +40,7 @@ export const games: GameInfo[] = [
     emoji: "🧩",
     route: "/games/sliding-puzzle",
     gradient: gradients.gold,
-    ready: false,
+    ready: true,
   },
   {
     id: "waterSort",
