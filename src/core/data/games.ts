@@ -24,7 +24,7 @@ export const games: GameInfo[] = [
     emoji: "✏️",
     route: "/games/word-builder",
     gradient: gradients.cool,
-    ready: false,
+    ready: true,
   },
   {
     id: "quiz",
