@@ -17,6 +17,7 @@ type Props = {
   subtitle?: string;
   onPlayAgain: () => void;
   onExit: () => void;
+  playAgainLabel?: string;
 };
 
 const animations = {
@@ -31,6 +32,7 @@ export function ResultModal({
   subtitle,
   onPlayAgain,
   onExit,
+  playAgainLabel = "Play again",
 }: Props) {
   const backdrop = useSharedValue(0);
   const card = useSharedValue(0);
@@ -62,7 +64,7 @@ export function ResultModal({
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
 
         <View style={styles.actions}>
-          <GradientButton label="Play again" onPress={onPlayAgain} />
+          <GradientButton label={playAgainLabel} onPress={onPlayAgain} />
           <PressableScale onPress={onExit} style={styles.exit}>
             <Text style={styles.exitText}>Exit</Text>
           </PressableScale>

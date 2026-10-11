@@ -48,7 +48,7 @@ export const games: GameInfo[] = [
     emoji: "🧪",
     route: "/games/water-sort",
     gradient: [colors.blue, colors.teal],
-    ready: false,
+    ready: true,
   },
   {
     id: "freeFlow",
