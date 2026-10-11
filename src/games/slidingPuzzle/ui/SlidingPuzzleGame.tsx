@@ -5,6 +5,8 @@ import {
   StatChip,
 } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
+import { starsForMoves } from "@/core/logic/stars";
+import { useProgress } from "@/core/store/progress";
 import { colors, gradients, radius, spacing, typography } from "@/core/theme";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
@@ -62,8 +64,15 @@ export function SlidingPuzzleGame() {
   const [solved, setSolved] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const lastMoved = useRef<number | null>(null);
+  const resultRecorded = useRef(false);
+  const recordResult = useProgress((state) => state.recordResult);
 
   const tileSize = (inner - GAP * (size - 1)) / size;
+  const stars = starsForMoves(
+    moves,
+    size === 3 ? 40 : 100,
+    size === 3 ? 80 : 200,
+  );
 
   // Timer runs until the puzzle is solved
   useEffect(() => {
@@ -79,17 +88,25 @@ export function SlidingPuzzleGame() {
       return;
     }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const id = setTimeout(() => setShowResult(true), 700);
+    const id = setTimeout(() => {
+      if (!resultRecorded.current) {
+        resultRecorded.current = true;
+        recordResult("slidingPuzzle", stars);
+      }
+      setShowResult(true);
+    }, 700);
     return () => clearTimeout(id);
-  }, [solved]);
+  }, [solved, recordResult, stars]);
 
   const startNew = (nextSize: 3 | 4 = size) => {
+    resultRecorded.current = false;
     setSize(nextSize);
     setBoard(shuffleBoard(nextSize));
     setMoves(0);
     setSeconds(0);
     setHintTile(null);
     setSolved(false);
+    setShowResult(false);
     lastMoved.current = null;
   };
 
@@ -190,6 +207,7 @@ export function SlidingPuzzleGame() {
           subtitle={`${moves} moves · ${formatTime(seconds)}`}
           onPlayAgain={() => startNew()}
           onExit={() => router.back()}
+          stars={stars}
         />
       )}
     </GameScreen>

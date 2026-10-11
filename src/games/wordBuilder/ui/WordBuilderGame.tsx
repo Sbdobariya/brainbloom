@@ -6,10 +6,12 @@ import {
 } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
 import { TimerBar } from "@/core/components/TimerBar";
+import { starsFromRatio } from "@/core/logic/stars";
+import { useProgress } from "@/core/store/progress";
 import { colors, gradients, radius, spacing, typography } from "@/core/theme";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { categoryInfo } from "../data/words";
 import {
@@ -36,10 +38,19 @@ export function WordBuilderGame() {
   const [correctCount, setCorrectCount] = useState(0);
   const [shuffleKey, setShuffleKey] = useState(0);
   const [finished, setFinished] = useState(false);
+  const resultRecorded = useRef(false);
+  const recordResult = useProgress((state) => state.recordResult);
 
   const entry = round[roundIndex];
   const tiles = useMemo(() => scrambleLetters(entry.word), [entry, shuffleKey]);
   const info = categoryInfo[entry.category];
+  const stars = starsFromRatio(correctCount / ROUNDS);
+
+  useEffect(() => {
+    if (!finished || resultRecorded.current) return;
+    resultRecorded.current = true;
+    recordResult("wordBuilder", stars);
+  }, [finished, recordResult, stars]);
 
   // Countdown: one tick per second, only while playing
   useEffect(() => {
@@ -108,6 +119,7 @@ export function WordBuilderGame() {
   };
 
   const restart = () => {
+    resultRecorded.current = false;
     setRound(pickRound(ROUNDS));
     setRoundIndex(0);
     setPlaced([]);
@@ -205,6 +217,7 @@ export function WordBuilderGame() {
           subtitle={`${correctCount}/${ROUNDS} words · Score ${score}`}
           onPlayAgain={restart}
           onExit={() => router.back()}
+          stars={stars}
         />
       )}
     </GameScreen>

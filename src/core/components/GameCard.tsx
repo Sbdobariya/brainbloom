@@ -14,6 +14,7 @@ type Props = {
   title: string;
   emoji: string;
   gradient: readonly [string, string];
+  stars?: number;
   locked?: boolean;
   index: number; // position in the grid, used to stagger the entrance
   onPress: () => void;
@@ -23,6 +24,7 @@ export function GameCard({
   title,
   emoji,
   gradient,
+  stars,
   locked,
   index,
   onPress,
@@ -56,6 +58,9 @@ export function GameCard({
         >
           <Text style={styles.emoji}>{emoji}</Text>
           <Text style={styles.title}>{title}</Text>
+          {stars !== undefined && stars > 0 && (
+            <Text style={styles.stars}>{stars}/3 ⭐</Text>
+          )}
           {locked && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>Soon</Text>
@@ -79,6 +84,7 @@ const styles = StyleSheet.create({
   locked: { opacity: 0.6 },
   emoji: { fontSize: 44 },
   title: { ...typography.heading, color: colors.text },
+  stars: { ...typography.caption, color: colors.text },
   badge: {
     position: "absolute",
     top: spacing.md,

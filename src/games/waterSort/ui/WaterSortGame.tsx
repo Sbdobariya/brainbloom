@@ -4,10 +4,12 @@ import {
   ResultModal,
   StatChip,
 } from "@/core/components";
+import { starsForMoves } from "@/core/logic/stars";
+import { useProgress } from "@/core/store/progress";
 import { colors, gradients, spacing } from "@/core/theme";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import {
   canPour,
@@ -43,8 +45,11 @@ export function WaterSortGame() {
   const [moves, setMoves] = useState(0);
   const [solved, setSolved] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const resultRecorded = useRef(false);
+  const recordResult = useProgress((state) => state.recordResult);
 
   const { colors: colorCount } = getLevelConfig(level);
+  const stars = starsForMoves(moves, colorCount * 5, colorCount * 8);
 
   // Let the last pour finish, then celebrate
   useEffect(() => {
@@ -53,17 +58,25 @@ export function WaterSortGame() {
       return;
     }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const id = setTimeout(() => setShowResult(true), 800);
+    const id = setTimeout(() => {
+      if (!resultRecorded.current) {
+        resultRecorded.current = true;
+        recordResult("waterSort", stars);
+      }
+      setShowResult(true);
+    }, 800);
     return () => clearTimeout(id);
-  }, [solved]);
+  }, [solved, recordResult, stars]);
 
   const loadLevel = (n: number) => {
+    resultRecorded.current = false;
     setLevel(n);
     setTubes(createLevel(n));
     setHistory([]);
     setSelected(null);
     setMoves(0);
     setSolved(false);
+    setShowResult(false);
   };
 
   const onTubePress = (i: number) => {
@@ -164,6 +177,7 @@ export function WaterSortGame() {
           playAgainLabel="Next level"
           onPlayAgain={() => loadLevel(level + 1)}
           onExit={() => router.back()}
+          stars={stars}
         />
       )}
     </GameScreen>

@@ -5,6 +5,8 @@ import {
   StatChip,
 } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
+import { starsForMoves } from "@/core/logic/stars";
+import { useProgress } from "@/core/store/progress";
 import { colors, gradients, radius, spacing, typography } from "@/core/theme";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
@@ -45,6 +47,13 @@ export function FreeFlowGame() {
   const [moves, setMoves] = useState(0);
   const [solved, setSolved] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const resultRecorded = useRef(false);
+  const recordResult = useProgress((state) => state.recordResult);
+  const stars = starsForMoves(
+    moves,
+    level.pairs.length * 2,
+    level.pairs.length * 4,
+  );
 
   // Refs hold the newest values while a finger is down (state updates are async)
   const pathsRef = useRef(paths);
@@ -62,18 +71,26 @@ export function FreeFlowGame() {
       return;
     }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    const id = setTimeout(() => setShowResult(true), 600);
+    const id = setTimeout(() => {
+      if (!resultRecorded.current) {
+        resultRecorded.current = true;
+        recordResult("freeFlow", stars);
+      }
+      setShowResult(true);
+    }, 600);
     return () => clearTimeout(id);
-  }, [solved]);
+  }, [solved, recordResult, stars]);
 
   const loadLevel = (n: number) => {
     const next = createLevel(n);
+    resultRecorded.current = false;
     setLevelNo(n);
     setLevel(next);
     commit(emptyPaths(next));
     setHistory([]);
     setMoves(0);
     setSolved(false);
+    setShowResult(false);
     activeRef.current = null;
   };
 
@@ -217,6 +234,7 @@ export function FreeFlowGame() {
           playAgainLabel="Next level"
           onPlayAgain={() => loadLevel(levelNo + 1)}
           onExit={() => router.back()}
+          stars={stars}
         />
       )}
     </GameScreen>

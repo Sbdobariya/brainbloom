@@ -1,8 +1,10 @@
 import { GameScreen, ResultModal, StatChip, TimerBar } from "@/core/components";
+import { starsFromRatio } from "@/core/logic/stars";
+import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { categoryInfo } from "../data/questions";
 import { calcQuizPoints, hideTwoWrong, pickQuestions } from "../logic/quiz";
@@ -30,9 +32,18 @@ export function QuizGame() {
   const [correctCount, setCorrectCount] = useState(0);
   const [lifelines, setLifelines] = useState({ fifty: 1, skip: 2, time: 2 });
   const [finished, setFinished] = useState(false);
+  const resultRecorded = useRef(false);
+  const recordResult = useProgress((state) => state.recordResult);
 
   const q = questions[index];
   const info = categoryInfo[q.category];
+  const stars = starsFromRatio(correctCount / QUESTIONS);
+
+  useEffect(() => {
+    if (!finished || resultRecorded.current) return;
+    resultRecorded.current = true;
+    recordResult("quiz", stars);
+  }, [finished, recordResult, stars]);
 
   // Countdown, only while a question is open
   useEffect(() => {
@@ -104,6 +115,7 @@ export function QuizGame() {
   };
 
   const restart = () => {
+    resultRecorded.current = false;
     setQuestions(pickQuestions(QUESTIONS, LEVEL));
     setIndex(0);
     setSelected(null);
@@ -205,6 +217,7 @@ export function QuizGame() {
           subtitle={`${correctCount}/${QUESTIONS} correct · Score ${score}`}
           onPlayAgain={restart}
           onExit={() => router.back()}
+          stars={stars}
         />
       )}
     </GameScreen>

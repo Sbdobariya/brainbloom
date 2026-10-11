@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { GradientButton } from "./GradientButton";
 import { PressableScale } from "./PressableScale";
+import { StarsRow } from "./StarsRow";
 
 type Props = {
   kind: "win" | "lose" | "draw";
@@ -18,6 +19,7 @@ type Props = {
   onPlayAgain: () => void;
   onExit: () => void;
   playAgainLabel?: string;
+  stars?: number;
 };
 
 const animations = {
@@ -33,6 +35,7 @@ export function ResultModal({
   onPlayAgain,
   onExit,
   playAgainLabel = "Play again",
+  stars,
 }: Props) {
   const backdrop = useSharedValue(0);
   const card = useSharedValue(0);
@@ -62,7 +65,7 @@ export function ResultModal({
         />
         <Text style={styles.title}>{title}</Text>
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
-
+        {stars !== undefined && <StarsRow stars={stars} />}
         <View style={styles.actions}>
           <GradientButton label={playAgainLabel} onPress={onPlayAgain} />
           <PressableScale onPress={onExit} style={styles.exit}>

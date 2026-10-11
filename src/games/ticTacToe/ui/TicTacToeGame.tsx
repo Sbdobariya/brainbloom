@@ -5,10 +5,12 @@ import {
   StatChip,
 } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
+import { starsForTicTacToe, type Stars } from "@/core/logic/stars";
+import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import {
   applyMove,
@@ -33,10 +35,16 @@ export function TicTacToeGame() {
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const [scores, setScores] = useState({ you: 0, draws: 0, cpu: 0 });
   const [showResult, setShowResult] = useState(false);
+  const resultRecorded = useRef(false);
+  const recordResult = useProgress((state) => state.recordResult);
 
   const result = getWinner(board);
   const draw = !result && isDraw(board);
   const over = !!result || draw;
+  const stars: Stars = starsForTicTacToe(
+    result ? (result.winner === "X" ? "win" : "lose") : "draw",
+    difficulty,
+  );
 
   // CPU plays after a short "thinking" delay
   useEffect(() => {
@@ -55,9 +63,15 @@ export function TicTacToeGame() {
       setShowResult(false);
       return;
     }
-    const id = setTimeout(() => setShowResult(true), 900);
+    const id = setTimeout(() => {
+      if (!resultRecorded.current) {
+        resultRecorded.current = true;
+        recordResult("ticTacToe", stars);
+      }
+      setShowResult(true);
+    }, 900);
     return () => clearTimeout(id);
-  }, [over]);
+  }, [over, recordResult, stars]);
 
   // Update scores once when a round ends
   useEffect(() => {
@@ -80,8 +94,10 @@ export function TicTacToeGame() {
   };
 
   const newRound = () => {
+    resultRecorded.current = false;
     setBoard(createBoard());
     setTurn("X");
+    setShowResult(false);
   };
 
   const changeDifficulty = (d: Difficulty) => {
@@ -160,6 +176,7 @@ export function TicTacToeGame() {
           }
           onPlayAgain={newRound}
           onExit={() => router.back()}
+          stars={stars}
         />
       )}
     </GameScreen>
