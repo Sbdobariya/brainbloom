@@ -1,7 +1,7 @@
 import { colors, radius, spacing, typography } from "@/core/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, type ViewStyle } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -17,6 +17,7 @@ type Props = {
   stars?: number;
   locked?: boolean;
   index: number; // position in the grid, used to stagger the entrance
+  width?: number | string;
   onPress: () => void;
 };
 
@@ -27,6 +28,7 @@ export function GameCard({
   stars,
   locked,
   index,
+  width = "48%",
   onPress,
 }: Props) {
   const progress = useSharedValue(0);
@@ -48,7 +50,9 @@ export function GameCard({
   }));
 
   return (
-    <Animated.View style={[styles.wrapper, entrance]}>
+    <Animated.View
+      style={[styles.wrapper, { width: width as ViewStyle["width"] }, entrance]}
+    >
       <PressableScale onPress={onPress} style={styles.pressable}>
         <LinearGradient
           colors={gradient}
@@ -73,7 +77,7 @@ export function GameCard({
 }
 
 const styles = StyleSheet.create({
-  wrapper: { width: "48%", marginBottom: spacing.lg },
+  wrapper: { marginBottom: spacing.lg },
   pressable: { width: "100%" },
   card: {
     height: 150,

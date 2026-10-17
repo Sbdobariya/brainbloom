@@ -9,6 +9,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
+  const cardWidth = 150;
   const totalStars = useProgress(selectTotalStars);
   const stars = useProgress((state) => state.stars);
   const streak = useProgress((state) => state.streak);
@@ -26,8 +27,20 @@ export default function Home() {
               value={`🔥 ${streak} ${streak === 1 ? "day" : "days"}`}
             />
           </View>
-          <Text style={styles.sectionHeading}>📚 Learn</Text>
-          <View style={styles.grid}>
+          <View style={styles.learnHeadingRow}>
+            <Text style={[styles.sectionHeading, styles.learnHeading]}>
+              📚 Learn
+            </Text>
+            <Text style={styles.learnHint}>Swipe →</Text>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            decelerationRate="fast"
+            snapToInterval={cardWidth + spacing.md}
+            contentContainerStyle={styles.learnContent}
+            style={styles.learnScroll}
+          >
             {learnModules.map((module, i) => (
               <GameCard
                 key={module.id}
@@ -37,12 +50,13 @@ export default function Home() {
                 stars={stars[module.id] ?? 0}
                 locked={!module.ready}
                 index={i}
+                width={cardWidth}
                 onPress={() =>
                   module.ready && router.push(module.route as Href)
                 }
               />
             ))}
-          </View>
+          </ScrollView>
           <Text style={styles.sectionHeading}>🎮 Games</Text>
           <View style={styles.grid}>
             {games.map((g, i) => (
@@ -93,6 +107,16 @@ const styles = StyleSheet.create({
     textAlign: "left",
     marginBottom: spacing.md,
   },
+  learnHeadingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing.md,
+  },
+  learnHeading: { marginBottom: 0 },
+  learnHint: { ...typography.caption, color: colors.textMuted },
+  learnScroll: { marginHorizontal: -spacing.lg },
+  learnContent: { gap: spacing.md, paddingRight: spacing.lg },
   title: {
     ...typography.title,
     color: colors.text,
