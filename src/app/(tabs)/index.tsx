@@ -2,7 +2,7 @@ import { AnimatedBackground, GameCard } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
 import { games } from "@/core/data/games";
 import { learnModules } from "@/core/data/learn";
-import { selectTotalStars, useProgress } from "@/core/store/progress";
+import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
 import { useResponsive } from "@/core/theme/responsive";
 import { Href, router } from "expo-router";
@@ -11,110 +11,84 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   const { columns, cardWidth, gap, padding, contentWidth, s } = useResponsive();
+  const gameColumns = Math.min(columns, 2);
+  const gameCardWidth =
+    gameColumns === columns
+      ? cardWidth
+      : Math.floor(
+          (contentWidth - padding * 2 - gap * (gameColumns - 1)) / gameColumns,
+        );
   const responsiveStyles = StyleSheet.create({
     content: {
       maxWidth: contentWidth,
       width: "100%",
       alignSelf: "center",
       paddingHorizontal: padding,
-      paddingTop: s(spacing.md),
       paddingBottom: s(spacing.lg),
     },
-    settingsButton: {
-      top: s(spacing.sm),
-      right: padding,
-      width: Math.max(56, s(48)),
-      height: Math.max(56, s(48)),
-      borderRadius: s(radius.pill),
+    stickyHeader: {
+      width: "100%",
+      maxWidth: contentWidth,
+      alignSelf: "center",
+      paddingHorizontal: padding,
+      paddingTop: s(spacing.md),
+      paddingBottom: s(spacing.sm),
     },
     header: { marginBottom: s(spacing.lg) },
-    statsPanel: {
-      gap: s(spacing.md),
-      padding: s(spacing.md),
-      marginBottom: s(spacing.xl),
-      borderRadius: s(radius.lg),
+    sectionRow: { gap: s(spacing.sm), marginBottom: s(spacing.md) },
+    viewAll: {
+      minHeight: Math.max(48, s(48)),
+      paddingHorizontal: s(spacing.md),
+      borderRadius: s(radius.pill),
       borderWidth: s(1),
     },
-    statItem: { gap: s(spacing.sm) },
-    statIcon: { fontSize: s(32) },
-    statLabel: { fontSize: s(typography.caption.fontSize) },
-    statValue: { fontSize: s(typography.heading.fontSize) },
-    sectionRow: { marginBottom: s(spacing.md) },
+    viewAllText: { fontSize: s(typography.caption.fontSize) },
     learnHeadingRow: { marginBottom: s(spacing.md) },
     learnScroll: { marginHorizontal: -padding },
     learnContent: { gap, paddingLeft: padding, paddingRight: padding },
     grid: {
       flexDirection: "column",
-      width: cardWidth * columns + gap * (columns - 1),
+      width: gameCardWidth * gameColumns + gap * (gameColumns - 1),
       columnGap: gap,
     },
     titleText: { fontSize: s(typography.title.fontSize) },
     subtitleText: { fontSize: s(typography.body.fontSize) },
     sectionText: { fontSize: s(typography.heading.fontSize) },
-    learnHintText: { fontSize: s(typography.caption.fontSize) },
-    settingsIcon: { fontSize: s(typography.heading.fontSize) },
     gridRow: { flexDirection: "row", columnGap: gap },
   });
-  const totalStars = useProgress(selectTotalStars);
   const stars = useProgress((state) => state.stars);
-  const streak = useProgress((state) => state.streak);
+  const visibleLessons = learnModules.slice(0, 4);
+  const visibleGames = games.slice(0, 4);
   const gameRows = Array.from(
-    { length: Math.ceil(games.length / columns) },
-    (_, row) => games.slice(row * columns, (row + 1) * columns),
+    { length: Math.ceil(visibleGames.length / gameColumns) },
+    (_, row) => visibleGames.slice(row * gameColumns, (row + 1) * gameColumns),
   );
 
   return (
     <AnimatedBackground>
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={["top"]}>
+        <View style={[styles.stickyHeader, responsiveStyles.stickyHeader]}>
+          <View style={[styles.header, responsiveStyles.header]}>
+            <Text
+              style={[styles.title, responsiveStyles.titleText]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
+              BrainBloom 🌱
+            </Text>
+            <Text
+              style={[styles.subtitle, responsiveStyles.subtitleText]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+            >
+              Let’s play and explore!
+            </Text>
+          </View>
+        </View>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={[styles.content, responsiveStyles.content]}>
-            <View style={[styles.header, responsiveStyles.header]}>
-              <Text
-                style={[styles.title, responsiveStyles.titleText]}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.75}
-              >
-                BrainBloom 🌱
-              </Text>
-              <Text
-                style={[styles.subtitle, responsiveStyles.subtitleText]}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                minimumFontScale={0.8}
-              >
-                Let’s play and explore!
-              </Text>
-            </View>
-            <View style={[styles.statsPanel, responsiveStyles.statsPanel]}>
-              <View style={[styles.statItem, responsiveStyles.statItem]}>
-                <Text style={[styles.statIcon, responsiveStyles.statIcon]}>
-                  ⭐
-                </Text>
-                <View style={styles.statCopy}>
-                  <Text style={[styles.statLabel, responsiveStyles.statLabel]}>
-                    STARS
-                  </Text>
-                  <Text style={[styles.statValue, responsiveStyles.statValue]}>
-                    {totalStars}
-                  </Text>
-                </View>
-              </View>
-              <View style={styles.statDivider} />
-              <View style={[styles.statItem, responsiveStyles.statItem]}>
-                <Text style={[styles.statIcon, responsiveStyles.statIcon]}>
-                  🔥
-                </Text>
-                <View style={styles.statCopy}>
-                  <Text style={[styles.statLabel, responsiveStyles.statLabel]}>
-                    STREAK
-                  </Text>
-                  <Text style={[styles.statValue, responsiveStyles.statValue]}>
-                    {streak} {streak === 1 ? "Day" : "Days"}
-                  </Text>
-                </View>
-              </View>
-            </View>
             <View
               style={[styles.learnHeadingRow, responsiveStyles.learnHeadingRow]}
             >
@@ -125,9 +99,20 @@ export default function Home() {
               >
                 📚 Learn & Explore
               </Text>
-              <Text style={[styles.learnHint, responsiveStyles.learnHintText]}>
-                Swipe ›
-              </Text>
+              <PressableScale
+                haptic={false}
+                onPress={() =>
+                  router.navigate({
+                    pathname: "/explore",
+                    params: { tab: "learn" },
+                  })
+                }
+                style={[styles.viewAll, responsiveStyles.viewAll]}
+              >
+                <Text style={[styles.learnHint, responsiveStyles.viewAllText]}>
+                  View All
+                </Text>
+              </PressableScale>
             </View>
             <ScrollView
               horizontal
@@ -140,7 +125,7 @@ export default function Home() {
               ]}
               style={[styles.learnScroll, responsiveStyles.learnScroll]}
             >
-              {learnModules.map((module, i) => (
+              {visibleLessons.map((module, i) => (
                 <GameCard
                   key={module.id}
                   title={module.title}
@@ -164,14 +149,28 @@ export default function Home() {
                 numberOfLines={1}
                 adjustsFontSizeToFit
               >
-                🎮 Mini Games Arcade
+                🎮 Mini Games
               </Text>
+              <PressableScale
+                haptic={false}
+                onPress={() =>
+                  router.navigate({
+                    pathname: "/explore",
+                    params: { tab: "games" },
+                  })
+                }
+                style={[styles.viewAll, responsiveStyles.viewAll]}
+              >
+                <Text style={[styles.learnHint, responsiveStyles.viewAllText]}>
+                  View All
+                </Text>
+              </PressableScale>
             </View>
             <View style={[styles.grid, responsiveStyles.grid]}>
               {gameRows.map((row, rowIndex) => (
                 <View key={rowIndex} style={responsiveStyles.gridRow}>
                   {row.map((g, colIndex) => {
-                    const index = rowIndex * columns + colIndex;
+                    const index = rowIndex * gameColumns + colIndex;
                     return (
                       <GameCard
                         key={g.id}
@@ -183,7 +182,7 @@ export default function Home() {
                         stars={stars[g.id] ?? 0}
                         locked={!g.ready}
                         index={index}
-                        width={cardWidth}
+                        width={gameCardWidth}
                         onPress={() => g.ready && router.push(g.route as Href)}
                       />
                     );
@@ -193,14 +192,6 @@ export default function Home() {
             </View>
           </View>
         </ScrollView>
-        <PressableScale
-          style={[styles.settingsButton, responsiveStyles.settingsButton]}
-          onPress={() => router.push("/settings")}
-        >
-          <Text style={[styles.settingsIcon, responsiveStyles.settingsIcon]}>
-            ⚙️
-          </Text>
-        </PressableScale>
       </SafeAreaView>
     </AnimatedBackground>
   );
@@ -210,15 +201,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1 },
   scrollContent: { flexGrow: 1 },
   content: {},
-  settingsButton: {
-    position: "absolute",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.card,
-    borderColor: colors.cardBorder,
-    borderWidth: 1,
-  },
-  settingsIcon: { ...typography.heading, color: colors.text },
+  stickyHeader: {},
   sectionHeading: {
     ...typography.heading,
     color: colors.text,
@@ -227,6 +210,13 @@ const styles = StyleSheet.create({
   },
   header: {},
   sectionRow: { flexDirection: "row", alignItems: "center" },
+  viewAll: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.card,
+    borderColor: colors.cardBorder,
+  },
   learnHeadingRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -244,27 +234,6 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textMuted,
     textAlign: "left",
-  },
-  statsPanel: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    backgroundColor: colors.card,
-    borderColor: colors.cardBorder,
-  },
-  statItem: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  statCopy: { flex: 1 },
-  statIcon: {},
-  statLabel: { ...typography.caption, color: colors.textMuted },
-  statValue: { ...typography.heading, color: colors.yellow },
-  statDivider: {
-    width: 1,
-    alignSelf: "stretch",
-    backgroundColor: colors.cardBorder,
   },
   grid: {},
 });
