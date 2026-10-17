@@ -13,6 +13,7 @@ export const colors = {
   blue: "#3D9BFF",
   purple: "#8B5CF6",
   red: "#FF4757",
+  brown: "#8B5E3C",
 } as const;
 
 export const gradients = {

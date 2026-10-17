@@ -1,7 +1,7 @@
 import { PressableScale } from "@/core/components/PressableScale";
 import { colors, radius } from "@/core/theme";
 import { useEffect } from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -19,6 +19,7 @@ type Props = {
   state: ChoiceState;
   onPress: () => void;
   fontSize?: number;
+  swatch?: string;
 };
 
 export function ChoiceTile({
@@ -27,6 +28,7 @@ export function ChoiceTile({
   state,
   onPress,
   fontSize = 56,
+  swatch,
 }: Props) {
   const shake = useSharedValue(0);
   const pop = useSharedValue(1);
@@ -73,15 +75,19 @@ export function ChoiceTile({
           state === "correct" && { backgroundColor: color },
         ]}
       >
-        <Text
-          style={[
-            styles.letter,
-            { fontSize },
-            { color: state === "correct" ? colors.bg : color },
-          ]}
-        >
-          {label}
-        </Text>
+        {swatch !== undefined ? (
+          <View style={[styles.swatch, { backgroundColor: swatch }]} />
+        ) : (
+          <Text
+            style={[
+              styles.letter,
+              { fontSize },
+              { color: state === "correct" ? colors.bg : color },
+            ]}
+          >
+            {label}
+          </Text>
+        )}
       </PressableScale>
     </Animated.View>
   );
@@ -98,4 +104,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
   },
   letter: { fontSize: 56, fontWeight: "800" },
+  swatch: { width: 64, height: 64, borderRadius: 32 },
 });

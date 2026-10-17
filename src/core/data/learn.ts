@@ -58,4 +58,20 @@ export const learnModules: LearnModule[] = [
     gradient: gradients.warm,
     ready: true,
   },
+  {
+    id: "colors",
+    title: "Colors",
+    emoji: "🌈",
+    route: "/learn/colors",
+    gradient: gradients.primary,
+    ready: true,
+  },
+  {
+    id: "findColor",
+    title: "Name the Color",
+    emoji: "🖍️",
+    route: "/learn/find-color",
+    gradient: gradients.cool,
+    ready: true,
+  },
 ];
