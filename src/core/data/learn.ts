@@ -42,4 +42,12 @@ export const learnModules: LearnModule[] = [
     gradient: gradients.gold,
     ready: true,
   },
+  {
+    id: "howMany",
+    title: "How Many?",
+    emoji: "🧮",
+    route: "/learn/how-many",
+    gradient: gradients.primary,
+    ready: true,
+  },
 ];

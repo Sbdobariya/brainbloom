@@ -1,5 +1,6 @@
 import { haptic, playSound, speak } from "@/core/audio/feedback";
 import { GameScreen, ResultModal, StatChip } from "@/core/components";
+import { ChoiceTile } from "@/core/components/ChoiceTile";
 import { PressableScale } from "@/core/components/PressableScale";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
@@ -8,7 +9,6 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { makeRounds } from "../logic/findLetter";
-import { LetterChoice } from "./LetterChoice";
 
 const ROUNDS = 10;
 const OPTIONS = 3;
@@ -107,9 +107,9 @@ export function FindLetterGame() {
 
       <View style={styles.choices}>
         {round.options.map((letter, i) => (
-          <LetterChoice
+          <ChoiceTile
             key={`${index}-${i}`}
-            letter={letter}
+            label={letter}
             color={CHOICE_COLORS[i % CHOICE_COLORS.length]}
             state={
               solved && i === round.answerIndex

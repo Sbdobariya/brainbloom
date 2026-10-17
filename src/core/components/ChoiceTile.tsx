@@ -14,13 +14,13 @@ import Animated, {
 export type ChoiceState = "idle" | "correct" | "wrong";
 
 type Props = {
-  letter: string;
+  label: string;
   color: string;
   state: ChoiceState;
   onPress: () => void;
 };
 
-export function LetterChoice({ letter, color, state, onPress }: Props) {
+export function ChoiceTile({ label, color, state, onPress }: Props) {
   const shake = useSharedValue(0);
   const pop = useSharedValue(1);
   const fade = useSharedValue(1);
@@ -72,7 +72,7 @@ export function LetterChoice({ letter, color, state, onPress }: Props) {
             { color: state === "correct" ? colors.bg : color },
           ]}
         >
-          {letter}
+          {label}
         </Text>
       </PressableScale>
     </Animated.View>
