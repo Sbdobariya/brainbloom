@@ -1,3 +1,4 @@
+import { haptic, playSound } from "@/core/audio/feedback";
 import {
   GameScreen,
   GradientButton,
@@ -9,7 +10,6 @@ import { TimerBar } from "@/core/components/TimerBar";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, gradients, radius, spacing, typography } from "@/core/theme";
-import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -50,7 +50,8 @@ export function WordBuilderGame() {
     if (!finished || resultRecorded.current) return;
     resultRecorded.current = true;
     recordResult("wordBuilder", stars);
-  }, [finished, recordResult, stars]);
+    playSound(correctCount >= 3 ? "win" : "lose");
+  }, [finished, recordResult, stars, correctCount]);
 
   // Countdown: one tick per second, only while playing
   useEffect(() => {
@@ -97,6 +98,7 @@ export function WordBuilderGame() {
   const onTilePress = (tile: Tile) => {
     if (status !== "playing" || placed.length >= entry.word.length) return;
     setPlaced((p) => [...p, tile]);
+    playSound("pop");
   };
 
   const onRemove = (slotIndex: number) => {
@@ -111,10 +113,12 @@ export function WordBuilderGame() {
       setStreak((s) => s + 1);
       setCorrectCount((c) => c + 1);
       setStatus("correct");
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptic.success();
+      playSound("correct");
     } else {
       setStatus("wrong");
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      haptic.warning();
+      playSound("wrong");
     }
   };
 

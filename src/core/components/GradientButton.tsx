@@ -27,6 +27,7 @@ export function GradientButton({
     <PressableScale
       disabled={disabled}
       onPress={onPress}
+      sound
       style={[styles.button, disabled && styles.disabled]}
     >
       <LinearGradient

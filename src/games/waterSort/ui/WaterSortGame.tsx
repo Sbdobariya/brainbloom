@@ -1,3 +1,4 @@
+import { haptic, playSound } from "@/core/audio/feedback";
 import {
   GameScreen,
   GradientButton,
@@ -7,7 +8,6 @@ import {
 import { starsForMoves } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, gradients, spacing } from "@/core/theme";
-import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -57,11 +57,12 @@ export function WaterSortGame() {
       setShowResult(false);
       return;
     }
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    haptic.success();
     const id = setTimeout(() => {
       if (!resultRecorded.current) {
         resultRecorded.current = true;
         recordResult("waterSort", stars);
+        playSound("win");
       }
       setShowResult(true);
     }, 800);
@@ -86,7 +87,8 @@ export function WaterSortGame() {
     if (selected === null) {
       if (tubes[i].length > 0) {
         setSelected(i);
-        Haptics.selectionAsync();
+        haptic.select();
+        playSound("tap");
       }
       return;
     }
@@ -104,7 +106,8 @@ export function WaterSortGame() {
       setTubes(next);
       setMoves((m) => m + 1);
       setSelected(null);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      haptic.tap();
+      playSound("pop");
       if (isSolved(next)) setSolved(true);
       return;
     }
@@ -112,7 +115,8 @@ export function WaterSortGame() {
     // Can't pour there: switch the selection if possible
     if (tubes[i].length > 0) {
       setSelected(i);
-      Haptics.selectionAsync();
+      haptic.select();
+      playSound("tap");
     } else {
       setSelected(null);
     }

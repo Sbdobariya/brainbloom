@@ -1,3 +1,4 @@
+import { haptic, playSound } from "@/core/audio/feedback";
 import {
   GameScreen,
   GradientButton,
@@ -8,7 +9,6 @@ import { PressableScale } from "@/core/components/PressableScale";
 import { starsForMoves } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, gradients, radius, spacing, typography } from "@/core/theme";
-import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
@@ -70,11 +70,12 @@ export function FreeFlowGame() {
       setShowResult(false);
       return;
     }
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    haptic.success();
     const id = setTimeout(() => {
       if (!resultRecorded.current) {
         resultRecorded.current = true;
         recordResult("freeFlow", stars);
+        playSound("win");
       }
       setShowResult(true);
     }, 600);
@@ -101,7 +102,7 @@ export function FreeFlowGame() {
     activeRef.current = res.color;
     snapshotRef.current = pathsRef.current;
     commit(res.paths);
-    Haptics.selectionAsync();
+    haptic.select();
   };
 
   const onMove = (cell: number) => {
@@ -115,7 +116,8 @@ export function FreeFlowGame() {
       !isPairConnected(level, before, color) &&
       isPairConnected(level, next, color)
     ) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      haptic.medium();
+      playSound("pop");
     }
     if (isSolved(level, next)) setSolved(true);
   };

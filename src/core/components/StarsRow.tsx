@@ -1,4 +1,4 @@
-import * as Haptics from "expo-haptics";
+import { haptic as feedbackHaptic, playSound } from "@/core/audio/feedback";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, {
@@ -26,10 +26,10 @@ function Star({ index, filled }: StarProps) {
       withSpring(0, { damping: 9, stiffness: 120 }),
     );
     if (filled) {
-      const id = setTimeout(
-        () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
-        delay,
-      );
+      const id = setTimeout(() => {
+        feedbackHaptic.tap();
+        playSound("star");
+      }, delay);
       return () => clearTimeout(id);
     }
   }, [index, filled, scale, tilt]);

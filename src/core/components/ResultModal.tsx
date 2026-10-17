@@ -68,7 +68,7 @@ export function ResultModal({
         {stars !== undefined && <StarsRow stars={stars} />}
         <View style={styles.actions}>
           <GradientButton label={playAgainLabel} onPress={onPlayAgain} />
-          <PressableScale onPress={onExit} style={styles.exit}>
+          <PressableScale onPress={onExit} sound style={styles.exit}>
             <Text style={styles.exitText}>Exit</Text>
           </PressableScale>
         </View>

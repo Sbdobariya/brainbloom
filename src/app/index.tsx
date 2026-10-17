@@ -1,7 +1,8 @@
 import { AnimatedBackground, GameCard, StatChip } from "@/core/components";
+import { PressableScale } from "@/core/components/PressableScale";
 import { games } from "@/core/data/games";
 import { selectTotalStars, useProgress } from "@/core/store/progress";
-import { colors, spacing, typography } from "@/core/theme";
+import { colors, radius, spacing, typography } from "@/core/theme";
 import { Href, router } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -39,6 +40,12 @@ export default function Home() {
             ))}
           </View>
         </ScrollView>
+        <PressableScale
+          style={styles.settingsButton}
+          onPress={() => router.push("/settings")}
+        >
+          <Text style={styles.settingsIcon}>⚙️</Text>
+        </PressableScale>
       </SafeAreaView>
     </AnimatedBackground>
   );
@@ -47,6 +54,20 @@ export default function Home() {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   content: { padding: spacing.lg },
+  settingsButton: {
+    position: "absolute",
+    top: spacing.sm,
+    right: spacing.lg,
+    width: 48,
+    height: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.card,
+    borderColor: colors.cardBorder,
+    borderWidth: 1,
+    borderRadius: radius.pill,
+  },
+  settingsIcon: { ...typography.heading, color: colors.text },
   title: {
     ...typography.title,
     color: colors.text,

@@ -1,8 +1,8 @@
+import { haptic, playSound } from "@/core/audio/feedback";
 import { GameScreen, ResultModal, StatChip, TimerBar } from "@/core/components";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
-import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -43,7 +43,8 @@ export function QuizGame() {
     if (!finished || resultRecorded.current) return;
     resultRecorded.current = true;
     recordResult("quiz", stars);
-  }, [finished, recordResult, stars]);
+    playSound(correctCount >= 6 ? "win" : "lose");
+  }, [finished, recordResult, stars, correctCount]);
 
   // Countdown, only while a question is open
   useEffect(() => {
@@ -88,11 +89,13 @@ export function QuizGame() {
       setStreak((s) => s + 1);
       setCorrectCount((c) => c + 1);
       setStatus("correct");
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptic.success();
+      playSound("correct");
     } else {
       setStreak(0);
       setStatus("wrong");
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      haptic.warning();
+      playSound("wrong");
     }
   };
 
@@ -100,11 +103,13 @@ export function QuizGame() {
     if (status !== "playing" || hidden.length > 0) return;
     setHidden(hideTwoWrong(q));
     setLifelines((l) => ({ ...l, fifty: l.fifty - 1 }));
+    playSound("tap");
   };
 
   const useSkip = () => {
     if (status !== "playing") return;
     setLifelines((l) => ({ ...l, skip: l.skip - 1 }));
+    playSound("tap");
     nextQuestion();
   };
 
@@ -112,6 +117,7 @@ export function QuizGame() {
     if (status !== "playing") return;
     setSecondsLeft((s) => s + 5);
     setLifelines((l) => ({ ...l, time: l.time - 1 }));
+    playSound("tap");
   };
 
   const restart = () => {

@@ -1,3 +1,4 @@
+import { haptic, playSound } from "@/core/audio/feedback";
 import {
   GameScreen,
   GradientButton,
@@ -8,7 +9,6 @@ import { PressableScale } from "@/core/components/PressableScale";
 import { starsForMoves } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, gradients, radius, spacing, typography } from "@/core/theme";
-import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
@@ -87,11 +87,12 @@ export function SlidingPuzzleGame() {
       setShowResult(false);
       return;
     }
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    haptic.success();
     const id = setTimeout(() => {
       if (!resultRecorded.current) {
         resultRecorded.current = true;
         recordResult("slidingPuzzle", stars);
+        playSound("win");
       }
       setShowResult(true);
     }, 700);
@@ -117,7 +118,8 @@ export function SlidingPuzzleGame() {
     setBoard(next);
     setMoves((m) => m + 1);
     setHintTile(null);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptic.tap();
+    playSound("pop");
     if (isSolved(next)) setSolved(true);
   };
 

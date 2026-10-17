@@ -1,4 +1,4 @@
-import * as Haptics from "expo-haptics";
+import { haptic as feedbackHaptic, playSound } from "@/core/audio/feedback";
 import React from "react";
 import { Pressable, StyleProp, ViewStyle } from "react-native";
 import Animated, {
@@ -15,6 +15,7 @@ type Props = {
   style?: StyleProp<ViewStyle>;
   scaleTo?: number;
   haptic?: boolean;
+  sound?: boolean;
   disabled?: boolean;
 };
 
@@ -24,6 +25,7 @@ export function PressableScale({
   style,
   scaleTo = 0.94,
   haptic = true,
+  sound = false,
   disabled = false,
 }: Props) {
   // Lives on the UI thread. Changing it does NOT re-render React.
@@ -45,7 +47,8 @@ export function PressableScale({
         scale.value = withSpring(1, { damping: 10, stiffness: 250 });
       }}
       onPress={() => {
-        if (haptic) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        if (haptic) feedbackHaptic.tap();
+        if (sound) playSound("tap");
         onPress?.();
       }}
       style={[style, animatedStyle]}

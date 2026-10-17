@@ -8,4 +8,5 @@ export * from "./ResultModal";
 export * from "./StarsRow";
 export * from "./StatChip";
 export { TimerBar } from "./TimerBar";
+export * from "./ToggleSwitch";
 

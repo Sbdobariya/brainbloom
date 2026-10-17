@@ -1,3 +1,4 @@
+import { haptic, playSound } from "@/core/audio/feedback";
 import {
   GameScreen,
   GradientButton,
@@ -8,7 +9,6 @@ import { PressableScale } from "@/core/components/PressableScale";
 import { starsForTicTacToe, type Stars } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
-import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
@@ -52,6 +52,7 @@ export function TicTacToeGame() {
     const id = setTimeout(() => {
       const move = getCpuMove(board, "O", difficulty);
       setBoard(applyMove(board, move, "O"));
+      playSound("pop");
       setTurn("X");
     }, 500);
     return () => clearTimeout(id);
@@ -67,18 +68,19 @@ export function TicTacToeGame() {
       if (!resultRecorded.current) {
         resultRecorded.current = true;
         recordResult("ticTacToe", stars);
+        playSound(result?.winner === "O" ? "lose" : "win");
       }
       setShowResult(true);
     }, 900);
     return () => clearTimeout(id);
-  }, [over, recordResult, stars]);
+  }, [over, recordResult, result?.winner, stars]);
 
   // Update scores once when a round ends
   useEffect(() => {
     if (!over) return;
     if (result?.winner === "X") {
       setScores((s) => ({ ...s, you: s.you + 1 }));
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptic.success();
     } else if (result?.winner === "O") {
       setScores((s) => ({ ...s, cpu: s.cpu + 1 }));
     } else {
@@ -90,6 +92,7 @@ export function TicTacToeGame() {
   const onCellPress = (i: number) => {
     if (over || turn !== "X" || board[i]) return;
     setBoard(applyMove(board, i, "X"));
+    playSound("pop");
     setTurn("O");
   };
 
