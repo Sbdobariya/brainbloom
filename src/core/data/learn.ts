@@ -32,7 +32,7 @@ export const learnModules: LearnModule[] = [
     emoji: "🔷",
     route: "/learn/shapes",
     gradient: gradients.primary,
-    ready: false,
+    ready: true,
   },
   {
     id: "findLetter",
@@ -48,6 +48,14 @@ export const learnModules: LearnModule[] = [
     emoji: "🧮",
     route: "/learn/how-many",
     gradient: gradients.primary,
+    ready: true,
+  },
+  {
+    id: "findShape",
+    title: "Name the Shape",
+    emoji: "🔶",
+    route: "/learn/find-shape",
+    gradient: gradients.warm,
     ready: true,
   },
 ];

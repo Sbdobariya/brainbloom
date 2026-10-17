@@ -18,9 +18,16 @@ type Props = {
   color: string;
   state: ChoiceState;
   onPress: () => void;
+  fontSize?: number;
 };
 
-export function ChoiceTile({ label, color, state, onPress }: Props) {
+export function ChoiceTile({
+  label,
+  color,
+  state,
+  onPress,
+  fontSize = 56,
+}: Props) {
   const shake = useSharedValue(0);
   const pop = useSharedValue(1);
   const fade = useSharedValue(1);
@@ -69,6 +76,7 @@ export function ChoiceTile({ label, color, state, onPress }: Props) {
         <Text
           style={[
             styles.letter,
+            { fontSize },
             { color: state === "correct" ? colors.bg : color },
           ]}
         >
