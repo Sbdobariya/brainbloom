@@ -1,8 +1,13 @@
 import { playSound } from "@/core/audio/feedback";
 import { GameScreen, ToggleSwitch } from "@/core/components";
+import { PressableScale } from "@/core/components/PressableScale";
+import { PRIVACY_URL } from "@/core/config";
+import { useGate } from "@/core/store/gate";
+import { useProgress } from "@/core/store/progress";
 import { useSettings } from "@/core/store/settings";
 import { colors, MIN_TOUCH, radius, spacing, typography } from "@/core/theme";
-import { StyleSheet, Text, View } from "react-native";
+import * as WebBrowser from "expo-web-browser";
+import { Alert, StyleSheet, Text, View } from "react-native";
 
 export default function Settings() {
   const soundOn = useSettings((state) => state.soundOn);
@@ -33,6 +38,42 @@ export default function Settings() {
       <Text style={styles.note}>
         BrainBloom stores your stars on this device only.
       </Text>
+      <Text style={styles.sectionHeading}>🔒 For parents</Text>
+      <View style={styles.rows}>
+        <PressableScale
+          style={styles.row}
+          onPress={() =>
+            useGate
+              .getState()
+              .request(() => WebBrowser.openBrowserAsync(PRIVACY_URL))
+          }
+        >
+          <Text style={styles.emoji}>🔒</Text>
+          <Text style={styles.label}>Privacy policy</Text>
+        </PressableScale>
+        <PressableScale
+          style={styles.row}
+          onPress={() =>
+            useGate.getState().request(() =>
+              Alert.alert(
+                "Reset progress?",
+                "This removes all stars and your streak on this device.",
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Reset",
+                    style: "destructive",
+                    onPress: () => useProgress.getState().resetProgress(),
+                  },
+                ],
+              ),
+            )
+          }
+        >
+          <Text style={styles.emoji}>🗑️</Text>
+          <Text style={styles.label}>Reset progress</Text>
+        </PressableScale>
+      </View>
     </GameScreen>
   );
 }
@@ -65,5 +106,11 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: spacing.lg,
     textAlign: "center",
+  },
+  sectionHeading: {
+    ...typography.heading,
+    color: colors.text,
+    marginTop: spacing.xl,
+    marginBottom: spacing.md,
   },
 });
