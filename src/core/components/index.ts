@@ -1,4 +1,5 @@
 export { AnimatedBackground } from "./AnimatedBackground";
+export * from "./AnimatedSplash";
 export { ChoiceTile } from "./ChoiceTile";
 export * from "./GameCard";
 export { GameHeader } from "./GameHeader";

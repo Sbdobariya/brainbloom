@@ -9,7 +9,8 @@
     "userInterfaceStyle": "dark",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.brainbloom"
+      "bundleIdentifier": "com.brainbloom",
+      "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {
@@ -20,9 +21,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.brainbloom",
-      "blockedPermissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "blockedPermissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "output": "static",
@@ -33,9 +32,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#0B0F2A",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#0F1538"
         }
       ],
       [
