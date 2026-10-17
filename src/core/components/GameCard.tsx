@@ -1,131 +1,315 @@
+import { haptic, playSound } from "@/core/audio/feedback";
 import { colors, radius, spacing, typography } from "@/core/theme";
 import { useResponsive } from "@/core/theme/responsive";
 import { LinearGradient } from "expo-linear-gradient";
-import { useEffect } from "react";
+import { useState } from "react";
 import {
+  Pressable,
   StyleSheet,
   Text,
   View,
   type TextStyle,
   type ViewStyle,
 } from "react-native";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withSpring,
-} from "react-native-reanimated";
-import { PressableScale } from "./PressableScale";
+import Animated, { FadeInDown } from "react-native-reanimated";
+
+function darken(hex: string, amount: number) {
+  const value = Number.parseInt(hex.slice(1), 16);
+  const channel = (shift: number) =>
+    Math.round(((value >> shift) & 255) * (1 - amount));
+  return `rgb(${channel(16)}, ${channel(8)}, ${channel(0)})`;
+}
+
+function lighten(hex: string, amount: number) {
+  const value = Number.parseInt(hex.slice(1), 16);
+  const channel = (shift: number) => {
+    const current = (value >> shift) & 255;
+    return Math.round(current + (255 - current) * amount);
+  };
+  return `rgb(${channel(16)}, ${channel(8)}, ${channel(0)})`;
+}
 
 type Props = {
   title: string;
   emoji: string;
   gradient: readonly [string, string];
-  stars?: number;
+  category?: string;
+  subtitle?: string;
+  stars?: number; // 0..3
+  onPress?: () => void;
+  index?: number;
   locked?: boolean;
-  index: number; // position in the grid, used to stagger the entrance
-  width?: number | string;
-  onPress: () => void;
+  width?: number;
 };
 
 export function GameCard({
   title,
   emoji,
   gradient,
-  stars,
-  locked,
-  index,
-  width,
+  category,
+  subtitle,
+  stars = 0,
   onPress,
+  index = 0,
+  locked,
+  width,
 }: Props) {
-  const { cardWidth, s } = useResponsive();
+  const { s } = useResponsive();
+  const [pressed, setPressed] = useState(false);
+  const isLocked = !!locked;
+  const ledge = s(7);
+  const edge = isLocked ? colors.cardBorder : darken(gradient[1], 0.34);
+  const faceColors: readonly [string, string] = isLocked
+    ? [colors.bgSoft, colors.cardBorder]
+    : [lighten(gradient[0], 0.24), gradient[1]];
+  const cardWidth = width ?? "100%";
   const responsiveStyles = StyleSheet.create({
     wrapper: {
-      width: (width ?? cardWidth) as ViewStyle["width"],
-      marginBottom: s(spacing.lg),
+      width: cardWidth as ViewStyle["width"],
+      paddingBottom: ledge,
+      marginBottom: s(spacing.md),
     } as ViewStyle,
-    card: {
-      minHeight: s(150),
+    ledge: {
+      left: 0,
+      right: 0,
+      top: s(8),
+      bottom: 0,
       borderRadius: s(radius.lg),
-      padding: s(spacing.lg),
+      backgroundColor: edge,
     } as ViewStyle,
-    emoji: { fontSize: s(44) } as TextStyle,
-    badge: {
-      top: s(spacing.md),
-      right: s(spacing.md),
+    face: {
+      minHeight: s(232),
+      padding: s(spacing.md),
+      borderRadius: s(radius.lg),
+      borderColor: edge,
+      borderWidth: s(2),
+      transform: [{ translateY: pressed && !isLocked ? ledge - s(2) : 0 }],
+      shadowColor: isLocked ? colors.bg : gradient[1],
+      shadowOpacity: isLocked ? 0 : 0.34,
+      shadowRadius: isLocked ? 0 : s(12),
+      shadowOffset: { width: 0, height: s(7) },
+      elevation: isLocked ? 0 : s(8),
+    } as ViewStyle,
+    topRow: {
+      alignSelf: "stretch",
+      gap: s(spacing.xs),
+      marginBottom: s(spacing.sm),
+    } as ViewStyle,
+    category: {
+      maxWidth: s(112),
+      minWidth: 0,
+      flexShrink: 1,
       paddingHorizontal: s(spacing.sm),
       paddingVertical: s(spacing.xs),
+      borderRadius: s(radius.pill),
     } as ViewStyle,
-    title: { fontSize: s(typography.heading.fontSize) } as TextStyle,
-    stars: { fontSize: s(typography.caption.fontSize) } as TextStyle,
-    badgeText: { fontSize: s(typography.caption.fontSize) } as TextStyle,
+    categoryText: { fontSize: s(typography.caption.fontSize) } as TextStyle,
+    stars: {
+      gap: s(2),
+      maxWidth: s(96),
+      flexShrink: 0,
+      paddingHorizontal: s(spacing.xs),
+      paddingVertical: s(2),
+      borderRadius: s(radius.pill),
+    } as ViewStyle,
+    star: { fontSize: s(16) } as TextStyle,
+    badge: {
+      width: s(80),
+      height: s(80),
+      borderRadius: s(40),
+      borderWidth: s(4),
+      marginBottom: s(spacing.sm),
+    } as ViewStyle,
+    emoji: { fontSize: s(46) } as TextStyle,
+    title: {
+      fontSize: s(typography.heading.fontSize),
+      marginTop: s(spacing.xs),
+    } as TextStyle,
+    subtitle: {
+      fontSize: s(typography.caption.fontSize),
+      marginTop: s(spacing.xs),
+    } as TextStyle,
   });
-  const progress = useSharedValue(0);
-
-  useEffect(() => {
-    // withDelay makes each card start a little after the previous one
-    progress.value = withDelay(
-      index * 90,
-      withSpring(1, { damping: 12, stiffness: 120 }),
-    );
-  }, [index, progress]);
-
-  const entrance = useAnimatedStyle(() => ({
-    opacity: progress.value,
-    transform: [
-      { translateY: (1 - progress.value) * 40 },
-      { scale: 0.8 + progress.value * 0.2 },
-    ],
-  }));
+  const earnedStars = Math.max(0, Math.min(3, stars));
 
   return (
-    <Animated.View style={[responsiveStyles.wrapper, entrance]}>
-      <PressableScale onPress={onPress} style={styles.pressable}>
+    <Animated.View
+      entering={FadeInDown.delay(index * 70).springify()}
+      style={responsiveStyles.wrapper}
+    >
+      <Pressable
+        disabled={isLocked}
+        onPressIn={() => !isLocked && setPressed(true)}
+        onPressOut={() => setPressed(false)}
+        onPress={() => {
+          if (isLocked) return;
+          playSound("tap");
+          haptic.tap();
+          onPress?.();
+        }}
+        accessibilityRole="button"
+        accessibilityLabel={
+          isLocked
+            ? `${title}, coming soon`
+            : `${title}, ${earnedStars} of 3 stars`
+        }
+        accessibilityState={{ disabled: isLocked }}
+        style={styles.pressable}
+      >
+        <View
+          style={[
+            StyleSheet.absoluteFill,
+            styles.ledge,
+            responsiveStyles.ledge,
+          ]}
+        />
         <LinearGradient
-          colors={gradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.card, responsiveStyles.card, locked && styles.locked]}
+          colors={faceColors}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+          style={[styles.face, responsiveStyles.face]}
         >
-          <Text style={responsiveStyles.emoji}>{emoji}</Text>
+          <View style={[styles.topRow, responsiveStyles.topRow]}>
+            {category ? (
+              <View
+                style={[
+                  styles.category,
+                  responsiveStyles.category,
+                  {
+                    backgroundColor: isLocked
+                      ? colors.card
+                      : "rgba(0,0,0,0.18)",
+                  },
+                ]}
+              >
+                <Text
+                  style={[styles.categoryText, responsiveStyles.categoryText]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                >
+                  {category.toUpperCase()}
+                </Text>
+              </View>
+            ) : (
+              <View />
+            )}
+            {!isLocked && (
+              <View style={[styles.stars, responsiveStyles.stars]}>
+                {[0, 1, 2].map((star) => (
+                  <Text
+                    key={star}
+                    style={[
+                      styles.star,
+                      responsiveStyles.star,
+                      star >= earnedStars && styles.emptyStar,
+                    ]}
+                  >
+                    {star < earnedStars ? "⭐" : "☆"}
+                  </Text>
+                ))}
+              </View>
+            )}
+          </View>
+          <View
+            style={[
+              styles.badge,
+              responsiveStyles.badge,
+              {
+                borderColor: isLocked
+                  ? colors.cardBorder
+                  : "rgba(255,255,255,0.72)",
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.emoji,
+                responsiveStyles.emoji,
+                isLocked && styles.lockedEmoji,
+              ]}
+            >
+              {emoji}
+            </Text>
+          </View>
           <Text
-            style={[styles.title, responsiveStyles.title]}
             numberOfLines={2}
             adjustsFontSizeToFit
-            minimumFontScale={0.75}
+            minimumFontScale={0.8}
+            style={[styles.title, responsiveStyles.title]}
           >
             {title}
           </Text>
-          {stars !== undefined && stars > 0 && (
-            <Text style={[styles.stars, responsiveStyles.stars]}>
-              {stars}/3 ⭐
+          {isLocked ? (
+            <Text style={[styles.subtitle, responsiveStyles.subtitle]}>
+              Coming soon
             </Text>
-          )}
-          {locked && (
-            <View style={[styles.badge, responsiveStyles.badge]}>
-              <Text style={[styles.badgeText, responsiveStyles.badgeText]}>
-                Soon
-              </Text>
-            </View>
-          )}
+          ) : subtitle ? (
+            <Text
+              style={[styles.subtitle, responsiveStyles.subtitle]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+            >
+              {subtitle}
+            </Text>
+          ) : null}
         </LinearGradient>
-      </PressableScale>
+      </Pressable>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   pressable: { width: "100%" },
-  card: {
+  face: {
+    alignItems: "center",
+    justifyContent: "flex-start",
+    overflow: "hidden",
+  },
+  ledge: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  badge: {
+    backgroundColor: "rgba(255,255,255,0.95)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 3,
+  },
+  emoji: {},
+  lockedEmoji: { opacity: 0.4 },
+  topRow: {
+    flexDirection: "row",
+    alignItems: "center",
     justifyContent: "space-between",
   },
-  locked: { opacity: 0.6 },
-  title: { ...typography.heading, color: colors.text },
-  stars: { ...typography.caption, color: colors.text },
-  badge: {
-    position: "absolute",
-    backgroundColor: "rgba(0,0,0,0.35)",
-    borderRadius: radius.pill,
+  category: { alignSelf: "flex-start" },
+  categoryText: {
+    ...typography.caption,
+    color: colors.text,
+    fontWeight: "700",
   },
-  badgeText: { ...typography.caption, color: colors.text },
+  stars: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.3)",
+  },
+  star: {
+    color: colors.yellow,
+    textShadowColor: "rgba(0,0,0,0.2)",
+    textShadowRadius: 2,
+  },
+  emptyStar: { color: colors.text, opacity: 0.9 },
+  title: {
+    ...typography.heading,
+    color: colors.text,
+    textAlign: "center",
+  },
+  subtitle: {
+    ...typography.caption,
+    color: "rgba(255,255,255,0.86)",
+    textAlign: "center",
+  },
 });

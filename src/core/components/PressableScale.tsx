@@ -1,6 +1,13 @@
 import { haptic as feedbackHaptic, playSound } from "@/core/audio/feedback";
 import React from "react";
-import { Pressable, StyleProp, ViewStyle } from "react-native";
+import {
+  Pressable,
+  StyleProp,
+  ViewStyle,
+  type AccessibilityRole,
+  type AccessibilityState,
+  type GestureResponderEvent,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -17,6 +24,11 @@ type Props = {
   haptic?: boolean;
   sound?: boolean;
   disabled?: boolean;
+  accessibilityRole?: AccessibilityRole;
+  accessibilityLabel?: string;
+  accessibilityState?: AccessibilityState;
+  onPressIn?: (event: GestureResponderEvent) => void;
+  onPressOut?: (event: GestureResponderEvent) => void;
 };
 
 export function PressableScale({
@@ -27,6 +39,11 @@ export function PressableScale({
   haptic = true,
   sound = false,
   disabled = false,
+  accessibilityRole,
+  accessibilityLabel,
+  accessibilityState,
+  onPressIn,
+  onPressOut,
 }: Props) {
   // Lives on the UI thread. Changing it does NOT re-render React.
   const scale = useSharedValue(1);
@@ -39,12 +56,17 @@ export function PressableScale({
   return (
     <AnimatedPressable
       disabled={disabled}
-      onPressIn={() => {
+      accessibilityRole={accessibilityRole}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={accessibilityState}
+      onPressIn={(event) => {
         // withSpring animates to the target with a natural bounce
         scale.value = withSpring(scaleTo, { damping: 15, stiffness: 300 });
+        onPressIn?.(event);
       }}
-      onPressOut={() => {
+      onPressOut={(event) => {
         scale.value = withSpring(1, { damping: 10, stiffness: 250 });
+        onPressOut?.(event);
       }}
       onPress={() => {
         if (haptic) feedbackHaptic.tap();
