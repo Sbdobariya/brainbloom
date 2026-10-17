@@ -15,6 +15,11 @@ type Props = {
 export function GameHeader({ title, subtitle, onBack, right }: Props) {
   const { s } = useResponsive();
   const buttonSize = Math.max(MIN_TOUCH, s(48));
+  const responsiveStyles = StyleSheet.create({
+    backLabel: { fontSize: s(typography.heading.fontSize) },
+    title: { fontSize: s(typography.heading.fontSize) },
+    subtitle: { fontSize: s(typography.caption.fontSize) },
+  });
 
   return (
     <View
@@ -38,7 +43,9 @@ export function GameHeader({ title, subtitle, onBack, right }: Props) {
               { width: buttonSize, height: buttonSize },
             ]}
           >
-            <Text style={styles.backLabel}>{"<"}</Text>
+            <Text style={[styles.backLabel, responsiveStyles.backLabel]}>
+              {"<"}
+            </Text>
           </View>
         </PressableScale>
       ) : (
@@ -51,12 +58,15 @@ export function GameHeader({ title, subtitle, onBack, right }: Props) {
           numberOfLines={1}
           adjustsFontSizeToFit
           minimumFontScale={0.75}
-          style={styles.title}
+          style={[styles.title, responsiveStyles.title]}
         >
           {title}
         </Text>
         {subtitle ? (
-          <Text numberOfLines={1} style={styles.subtitle}>
+          <Text
+            numberOfLines={1}
+            style={[styles.subtitle, responsiveStyles.subtitle]}
+          >
             {subtitle}
           </Text>
         ) : null}

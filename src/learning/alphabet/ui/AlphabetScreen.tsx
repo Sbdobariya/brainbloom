@@ -2,6 +2,7 @@ import { playSound, speak } from "@/core/audio/feedback";
 import { GameScreen } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -31,6 +32,20 @@ type CardProps = { item: LetterItem; color: string; dir: 1 | -1 };
 // This component is re-created (via key) for every letter, so its starting
 // values below act as the "enter from the side" animation.
 function LetterCard({ item, color, dir }: CardProps) {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    card: {
+      gap: s(spacing.md),
+      paddingVertical: s(spacing.xl),
+      borderWidth: s(3),
+      borderRadius: s(radius.lg),
+    },
+    letters: { fontSize: s(96) },
+    lower: { fontSize: s(72) },
+    emoji: { fontSize: s(110) },
+    word: { fontSize: s(typography.title.fontSize) },
+    tapHint: { fontSize: s(typography.caption.fontSize) },
+  });
   const x = useSharedValue(dir * 90);
   const opacity = useSharedValue(0);
   const bounce = useSharedValue(1);
@@ -59,28 +74,62 @@ function LetterCard({ item, color, dir }: CardProps) {
   };
 
   return (
-    <Animated.View style={[styles.card, { borderColor: color }, cardStyle]}>
-      <Text style={[styles.letters, { color }]}>
+    <Animated.View
+      style={[
+        styles.card,
+        responsiveStyles.card,
+        { borderColor: color },
+        cardStyle,
+      ]}
+    >
+      <Text style={[styles.letters, responsiveStyles.letters, { color }]}>
         {item.letter}
-        <Text style={styles.lower}>{item.letter.toLowerCase()}</Text>
+        <Text style={[styles.lower, responsiveStyles.lower]}>
+          {item.letter.toLowerCase()}
+        </Text>
       </Text>
 
       <PressableScale onPress={onTapEmoji} haptic={false} scaleTo={0.9}>
-        <Animated.Text style={[styles.emoji, emojiStyle]}>
+        <Animated.Text
+          style={[styles.emoji, responsiveStyles.emoji, emojiStyle]}
+        >
           {item.emoji}
         </Animated.Text>
       </PressableScale>
 
-      <Text style={styles.word}>
+      <Text style={[styles.word, responsiveStyles.word]}>
         <Text style={{ color }}>{item.word[0]}</Text>
         {item.word.slice(1)}
       </Text>
-      <Text style={styles.tapHint}>Tap the picture to hear it again 🔊</Text>
+      <Text style={[styles.tapHint, responsiveStyles.tapHint]}>
+        Tap the picture to hear it again 🔊
+      </Text>
     </Animated.View>
   );
 }
 
 export function AlphabetScreen() {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    progress: {
+      marginTop: s(spacing.lg),
+      fontSize: s(typography.caption.fontSize),
+    },
+    nav: { paddingBottom: s(spacing.xl) },
+    navButton: {
+      width: Math.max(56, s(72)),
+      height: Math.max(56, s(72)),
+      borderWidth: s(2),
+      borderRadius: s(radius.pill),
+    },
+    speaker: {
+      width: Math.max(56, s(88)),
+      height: Math.max(56, s(88)),
+      borderRadius: s(radius.pill),
+    },
+    navText: { fontSize: s(26) },
+    speakerText: { fontSize: s(38) },
+  });
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<1 | -1>(1);
 
@@ -97,7 +146,7 @@ export function AlphabetScreen() {
 
   return (
     <GameScreen title="🔤 ABC" subtitle="Learn the alphabet">
-      <Text style={styles.progress}>
+      <Text style={[styles.progress, responsiveStyles.progress]}>
         {index + 1} / {alphabet.length}
       </Text>
 
@@ -105,34 +154,41 @@ export function AlphabetScreen() {
         <LetterCard key={index} item={item} color={color} dir={dir} />
       </View>
 
-      <View style={styles.nav}>
+      <View style={[styles.nav, responsiveStyles.nav]}>
         <PressableScale
-          style={[styles.navButton, index === 0 && styles.navDisabled]}
+          style={[
+            styles.navButton,
+            responsiveStyles.navButton,
+            index === 0 && styles.navDisabled,
+          ]}
           disabled={index === 0}
           haptic={false}
           onPress={() => go(-1)}
         >
-          <Text style={styles.navText}>◀</Text>
+          <Text style={[styles.navText, responsiveStyles.navText]}>◀</Text>
         </PressableScale>
 
         <PressableScale
-          style={styles.speaker}
+          style={[styles.speaker, responsiveStyles.speaker]}
           haptic={false}
           onPress={() => sayIt(item)}
         >
-          <Text style={styles.speakerText}>🔊</Text>
+          <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+            🔊
+          </Text>
         </PressableScale>
 
         <PressableScale
           style={[
             styles.navButton,
+            responsiveStyles.navButton,
             index === alphabet.length - 1 && styles.navDisabled,
           ]}
           disabled={index === alphabet.length - 1}
           haptic={false}
           onPress={() => go(1)}
         >
-          <Text style={styles.navText}>▶</Text>
+          <Text style={[styles.navText, responsiveStyles.navText]}>▶</Text>
         </PressableScale>
       </View>
     </GameScreen>
@@ -144,47 +200,38 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
     textAlign: "center",
-    marginTop: spacing.lg,
   },
-  stage: { flex: 1, justifyContent: "center", overflow: "hidden" },
+  stage: { flex: 1, justifyContent: "center" },
   card: {
     alignItems: "center",
-    gap: spacing.md,
-    paddingVertical: spacing.xl,
     backgroundColor: colors.card,
-    borderWidth: 3,
-    borderRadius: radius.lg,
   },
-  letters: { ...typography.title, fontSize: 96 },
-  lower: { ...typography.heading, fontSize: 72 },
-  emoji: { fontSize: 110 },
+  letters: { ...typography.title },
+  lower: { ...typography.heading },
+  emoji: {},
   word: { ...typography.title, color: colors.text },
-  tapHint: { ...typography.caption, color: colors.textMuted },
+  tapHint: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textAlign: "center",
+  },
   nav: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingBottom: spacing.xl,
   },
   navButton: {
-    width: 72,
-    height: 72,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 2,
-    borderRadius: radius.pill,
   },
   navDisabled: { opacity: 0.3 },
-  navText: { color: colors.text, fontSize: 26 },
+  navText: { color: colors.text },
   speaker: {
-    width: 88,
-    height: 88,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.purple,
-    borderRadius: radius.pill,
   },
-  speakerText: { fontSize: 38 },
+  speakerText: {},
 });

@@ -17,6 +17,30 @@ const CHOICE_COLORS = [colors.pink, colors.teal, colors.orange];
 
 export function FindLetterGame() {
   const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
+    card: {
+      marginTop: s(spacing.xl),
+      gap: s(spacing.sm),
+      padding: s(spacing.xl),
+      borderWidth: s(1),
+      borderRadius: s(radius.lg),
+    },
+    emoji: { fontSize: s(100) },
+    word: { fontSize: s(typography.title.fontSize) },
+    question: {
+      fontSize: s(typography.body.fontSize),
+      minHeight: s(22),
+    },
+    speaker: {
+      width: Math.max(56, s(56)),
+      height: Math.max(56, s(56)),
+      marginTop: s(spacing.sm),
+      borderRadius: s(radius.pill),
+    },
+    speakerText: { fontSize: s(26) },
+    choices: { gap: s(spacing.md), marginTop: s(spacing.xl) },
+  });
   const [rounds, setRounds] = useState(() => makeRounds(ROUNDS, OPTIONS));
   const [index, setIndex] = useState(0);
   const [wrong, setWrong] = useState<number[]>([]);
@@ -28,7 +52,6 @@ export function FindLetterGame() {
   const { target } = round;
   const ratio = firstTry / ROUNDS;
   const stars = starsFromRatio(ratio);
-  const speakerSize = Math.max(48, s(56));
 
   const ask = () => speak(`Which letter does ${target.word} start with?`);
 
@@ -88,7 +111,7 @@ export function FindLetterGame() {
 
   return (
     <GameScreen title="🔎 Find the Letter" subtitle="Listen and tap">
-      <View style={styles.row}>
+      <View style={[styles.row, responsiveStyles.row]}>
         <StatChip
           label="ROUND"
           value={`${index + 1}/${ROUNDS}`}
@@ -97,22 +120,26 @@ export function FindLetterGame() {
         <StatChip label="FIRST TRY" value={firstTry} color={colors.yellow} />
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.emoji}>{target.emoji}</Text>
-        <Text style={styles.word}>{target.word}</Text>
-        <Text style={styles.question}>
+      <View style={[styles.card, responsiveStyles.card]}>
+        <Text style={[styles.emoji, responsiveStyles.emoji]}>
+          {target.emoji}
+        </Text>
+        <Text style={[styles.word, responsiveStyles.word]}>{target.word}</Text>
+        <Text style={[styles.question, responsiveStyles.question]}>
           {solved ? "Great job! 🎉" : "Which letter does it start with?"}
         </Text>
         <PressableScale
-          style={[styles.speaker, { width: speakerSize, height: speakerSize }]}
+          style={[styles.speaker, responsiveStyles.speaker]}
           haptic={false}
           onPress={ask}
         >
-          <Text style={styles.speakerText}>🔊</Text>
+          <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+            🔊
+          </Text>
         </PressableScale>
       </View>
 
-      <View style={styles.choices}>
+      <View style={[styles.choices, responsiveStyles.choices]}>
         {round.options.map((letter, i) => (
           <ChoiceTile
             key={`${index}-${i}`}
@@ -145,27 +172,20 @@ export function FindLetterGame() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.lg },
+  row: { flexDirection: "row" },
   card: {
-    marginTop: spacing.xl,
     alignItems: "center",
-    gap: spacing.sm,
-    paddingVertical: spacing.xl,
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 1,
-    borderRadius: radius.lg,
   },
-  emoji: { fontSize: 100 },
+  emoji: {},
   word: { ...typography.title, color: colors.text },
-  question: { ...typography.body, color: colors.teal, minHeight: 22 },
+  question: { ...typography.body, color: colors.teal },
   speaker: {
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.purple,
-    borderRadius: radius.pill,
-    marginTop: spacing.sm,
   },
-  speakerText: { fontSize: 26 },
-  choices: { flexDirection: "row", gap: spacing.md, marginTop: spacing.xl },
+  speakerText: {},
+  choices: { flexDirection: "row" },
 });

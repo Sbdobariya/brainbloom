@@ -34,6 +34,8 @@ export function TicTacToeGame() {
     row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
     status: { marginTop: s(spacing.xl) },
     chip: { minHeight: Math.max(56, s(48)), borderRadius: s(radius.pill) },
+    statusText: { fontSize: s(typography.heading.fontSize) },
+    chipText: { fontSize: s(typography.body.fontSize) },
     board: { width: boardSize, gap, marginTop: s(spacing.xl) },
     boardRow: { flexDirection: "row", gap },
     footer: { paddingBottom: s(spacing.xl) },
@@ -137,7 +139,13 @@ export function TicTacToeGame() {
         <StatChip label="CPU" value={scores.cpu} color={colors.teal} />
       </View>
 
-      <Text style={styles.status}>{status}</Text>
+      <Text
+        style={[styles.status, responsiveStyles.statusText]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
+        {status}
+      </Text>
 
       <View style={[styles.row, responsiveStyles.row]}>
         {(["easy", "hard"] as const).map((d) => (
@@ -150,7 +158,11 @@ export function TicTacToeGame() {
               difficulty === d && styles.chipActive,
             ]}
           >
-            <Text style={styles.chipText}>
+            <Text
+              style={[styles.chipText, responsiveStyles.chipText]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
               {d === "easy" ? "🙂 Easy" : "💀 Hard"}
             </Text>
           </PressableScale>

@@ -39,7 +39,9 @@ const PALETTE = [
 
 export function FreeFlowGame() {
   const { width, height, padding, s } = useResponsive();
-  const boardPx = Math.min(width - padding * 2, height * 0.5, s(380));
+  const maxBoard = Math.floor(
+    Math.min(width - padding * 2, height * 0.5, s(380)),
+  );
   const responsiveStyles = StyleSheet.create({
     row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
     levelRow: { gap: s(spacing.lg), marginTop: s(spacing.lg) },
@@ -49,7 +51,10 @@ export function FreeFlowGame() {
       borderRadius: s(radius.pill),
     },
     arrowText: { fontSize: s(16) },
-    levelText: { minWidth: s(100) },
+    levelText: {
+      minWidth: s(100),
+      fontSize: s(typography.heading.fontSize),
+    },
     boardWrap: {
       marginTop: s(spacing.lg),
       padding: s(spacing.sm),
@@ -62,6 +67,8 @@ export function FreeFlowGame() {
 
   const [levelNo, setLevelNo] = useState(1);
   const [level, setLevel] = useState(() => createLevel(1));
+  const boardCellSize = Math.floor(maxBoard / level.size);
+  const boardPx = boardCellSize * level.size;
   const [paths, setPaths] = useState<Paths>(() => emptyPaths(level));
   const [history, setHistory] = useState<Paths[]>([]);
   const [moves, setMoves] = useState(0);
@@ -196,7 +203,11 @@ export function FreeFlowGame() {
         >
           <Text style={[styles.arrowText, responsiveStyles.arrowText]}>◀</Text>
         </PressableScale>
-        <Text style={[styles.levelText, responsiveStyles.levelText]}>
+        <Text
+          style={[styles.levelText, responsiveStyles.levelText]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+        >
           Level {levelNo}
         </Text>
         <PressableScale

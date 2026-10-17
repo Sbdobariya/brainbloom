@@ -54,11 +54,18 @@ export function SlidingPuzzleGame() {
   const { width, height, padding, s } = useResponsive();
   const gap = s(8);
   const pad = s(10);
-  const boardPx = Math.min(width - padding * 2, height * 0.45, s(380));
+  const boardPx = Math.floor(
+    Math.min(width - padding * 2, height * 0.45, s(380)),
+  );
   const inner = boardPx - pad * 2;
   const responsiveStyles = StyleSheet.create({
     row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
-    chips: { minHeight: Math.max(56, s(48)), borderRadius: s(radius.pill) },
+    chips: {
+      minHeight: Math.max(56, s(48)),
+      borderRadius: s(radius.pill),
+      borderWidth: s(1),
+    },
+    chipText: { fontSize: s(typography.body.fontSize) },
     board: {
       marginTop: s(spacing.xl),
       borderRadius: s(radius.lg),
@@ -86,7 +93,7 @@ export function SlidingPuzzleGame() {
   const resultRecorded = useRef(false);
   const recordResult = useProgress((state) => state.recordResult);
 
-  const tileSize = (inner - gap * (size - 1)) / size;
+  const tileSize = Math.floor((inner - gap * (size - 1)) / size);
   const stars = starsForMoves(
     moves,
     size === 3 ? 40 : 100,
@@ -172,7 +179,7 @@ export function SlidingPuzzleGame() {
               size === s && styles.chipActive,
             ]}
           >
-            <Text style={styles.chipText}>
+            <Text style={[styles.chipText, responsiveStyles.chipText]}>
               {s === 3 ? "😊" : "⚡"} {s}×{s}
             </Text>
           </PressableScale>
@@ -248,7 +255,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 1,
   },
   chipActive: { borderColor: colors.yellow },
   chipText: { ...typography.body, color: colors.text },

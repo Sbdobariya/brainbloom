@@ -21,6 +21,22 @@ type CardProps = { item: ColorItem; dir: 1 | -1 };
 
 function ColorCard({ item, dir }: CardProps) {
   const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    card: {
+      gap: s(spacing.sm),
+      paddingVertical: s(spacing.xl),
+      paddingHorizontal: s(spacing.lg),
+      borderWidth: s(3),
+      borderRadius: s(radius.lg),
+    },
+    emoji: { fontSize: s(80) },
+    name: { fontSize: s(40) },
+    fact: { fontSize: s(typography.body.fontSize) },
+    tapHint: {
+      fontSize: s(typography.caption.fontSize),
+      marginTop: s(spacing.xs),
+    },
+  });
   const x = useSharedValue(dir * 90);
   const opacity = useSharedValue(0);
   const wobble = useSharedValue(0);
@@ -56,7 +72,14 @@ function ColorCard({ item, dir }: CardProps) {
   };
 
   return (
-    <Animated.View style={[styles.card, { borderColor: item.hex }, cardStyle]}>
+    <Animated.View
+      style={[
+        styles.card,
+        responsiveStyles.card,
+        { borderColor: item.hex },
+        cardStyle,
+      ]}
+    >
       <PressableScale onPress={onTapColor} haptic={false} scaleTo={0.92}>
         <Animated.View style={circleStyle}>
           <View
@@ -70,18 +93,51 @@ function ColorCard({ item, dir }: CardProps) {
               },
             ]}
           >
-            <Text style={styles.emoji}>{item.emoji}</Text>
+            <Text style={[styles.emoji, responsiveStyles.emoji]}>
+              {item.emoji}
+            </Text>
           </View>
         </Animated.View>
       </PressableScale>
-      <Text style={[styles.name, { color: item.hex }]}>{item.name}</Text>
-      <Text style={styles.fact}>{`${item.name}, like a ${item.thing}`}</Text>
-      <Text style={styles.tapHint}>Tap the color to hear it again 🔊</Text>
+      <Text
+        style={[styles.name, responsiveStyles.name, { color: item.hex }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
+        {item.name}
+      </Text>
+      <Text
+        style={[styles.fact, responsiveStyles.fact]}
+      >{`${item.name}, like a ${item.thing}`}</Text>
+      <Text style={[styles.tapHint, responsiveStyles.tapHint]}>
+        Tap the color to hear it again 🔊
+      </Text>
     </Animated.View>
   );
 }
 
 export function ColorsScreen() {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    progress: {
+      marginTop: s(spacing.lg),
+      fontSize: s(typography.caption.fontSize),
+    },
+    nav: { paddingBottom: s(spacing.xl) },
+    navButton: {
+      width: Math.max(56, s(72)),
+      height: Math.max(56, s(72)),
+      borderWidth: s(2),
+      borderRadius: s(radius.pill),
+    },
+    speaker: {
+      width: Math.max(56, s(88)),
+      height: Math.max(56, s(88)),
+      borderRadius: s(radius.pill),
+    },
+    navText: { fontSize: s(26) },
+    speakerText: { fontSize: s(38) },
+  });
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<1 | -1>(1);
 
@@ -97,7 +153,7 @@ export function ColorsScreen() {
 
   return (
     <GameScreen title="🌈 Colors" subtitle="Learn the colors">
-      <Text style={styles.progress}>
+      <Text style={[styles.progress, responsiveStyles.progress]}>
         {index + 1} / {colorItems.length}
       </Text>
 
@@ -105,34 +161,41 @@ export function ColorsScreen() {
         <ColorCard key={index} item={item} dir={dir} />
       </View>
 
-      <View style={styles.nav}>
+      <View style={[styles.nav, responsiveStyles.nav]}>
         <PressableScale
-          style={[styles.navButton, index === 0 && styles.navDisabled]}
+          style={[
+            styles.navButton,
+            responsiveStyles.navButton,
+            index === 0 && styles.navDisabled,
+          ]}
           disabled={index === 0}
           haptic={false}
           onPress={() => go(-1)}
         >
-          <Text style={styles.navText}>◀</Text>
+          <Text style={[styles.navText, responsiveStyles.navText]}>◀</Text>
         </PressableScale>
 
         <PressableScale
-          style={styles.speaker}
+          style={[styles.speaker, responsiveStyles.speaker]}
           haptic={false}
           onPress={() => sayIt(item)}
         >
-          <Text style={styles.speakerText}>🔊</Text>
+          <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+            🔊
+          </Text>
         </PressableScale>
 
         <PressableScale
           style={[
             styles.navButton,
+            responsiveStyles.navButton,
             index === colorItems.length - 1 && styles.navDisabled,
           ]}
           disabled={index === colorItems.length - 1}
           haptic={false}
           onPress={() => go(1)}
         >
-          <Text style={styles.navText}>▶</Text>
+          <Text style={[styles.navText, responsiveStyles.navText]}>▶</Text>
         </PressableScale>
       </View>
     </GameScreen>
@@ -144,55 +207,40 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
     textAlign: "center",
-    marginTop: spacing.lg,
   },
-  stage: { flex: 1, justifyContent: "center", overflow: "hidden" },
+  stage: { flex: 1, justifyContent: "center" },
   card: {
     alignItems: "center",
-    gap: spacing.sm,
-    paddingVertical: spacing.xl,
-    paddingHorizontal: spacing.lg,
     backgroundColor: colors.card,
-    borderWidth: 3,
-    borderRadius: radius.lg,
   },
   circle: {
     alignItems: "center",
     justifyContent: "center",
   },
-  emoji: { fontSize: 80 },
-  name: { ...typography.title, fontSize: 40 },
+  emoji: {},
+  name: { ...typography.title },
   fact: { ...typography.body, color: colors.text, textAlign: "center" },
   tapHint: {
     ...typography.caption,
     color: colors.textMuted,
-    marginTop: spacing.xs,
   },
   nav: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingBottom: spacing.xl,
   },
   navButton: {
-    width: 72,
-    height: 72,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 2,
-    borderRadius: radius.pill,
   },
   navDisabled: { opacity: 0.3 },
-  navText: { color: colors.text, fontSize: 26 },
+  navText: { color: colors.text },
   speaker: {
-    width: 88,
-    height: 88,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.purple,
-    borderRadius: radius.pill,
   },
-  speakerText: { fontSize: 38 },
+  speakerText: {},
 });

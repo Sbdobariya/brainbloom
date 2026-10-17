@@ -26,6 +26,7 @@ export function ColorTile({ hex, label, state, onPress }: Props) {
       borderRadius: s(radius.lg),
     },
     mark: { fontSize: s(40) },
+    label: { marginTop: s(spacing.xs) },
   });
 
   const borderColor =
@@ -62,7 +63,9 @@ export function ColorTile({ hex, label, state, onPress }: Props) {
         </View>
       )}
 
-      {label ? <Text style={styles.label}>{label}</Text> : null}
+      {label ? (
+        <Text style={[styles.label, responsiveStyles.label]}>{label}</Text>
+      ) : null}
     </PressableScale>
   );
 }
@@ -93,7 +96,6 @@ const styles = StyleSheet.create({
   label: {
     ...typography.caption,
     color: colors.text,
-    marginTop: spacing.xs,
     textShadowColor: colors.bg,
     textShadowRadius: 3,
   },

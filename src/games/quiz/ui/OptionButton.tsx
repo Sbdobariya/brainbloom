@@ -15,18 +15,19 @@ import Animated, {
 export type OptionState = "idle" | "correct" | "wrong" | "hidden" | "dimmed";
 
 type Props = {
+  width: number;
   letter: string;
   label: string;
   state: OptionState;
   onPress: () => void;
 };
 
-export function OptionButton({ letter, label, state, onPress }: Props) {
-  const { cardWidth, s } = useResponsive();
+export function OptionButton({ width, letter, label, state, onPress }: Props) {
+  const { s } = useResponsive();
   const responsiveStyles = StyleSheet.create({
-    wrapper: { width: cardWidth },
+    wrapper: { width },
     button: {
-      minHeight: s(72),
+      minHeight: Math.max(48, s(72)),
       gap: s(spacing.md),
       paddingHorizontal: s(spacing.md),
       borderWidth: s(2),
@@ -37,6 +38,8 @@ export function OptionButton({ letter, label, state, onPress }: Props) {
       height: s(32),
       borderRadius: s(radius.sm),
     },
+    badgeText: { fontSize: s(typography.caption.fontSize) },
+    label: { fontSize: s(typography.heading.fontSize) },
   });
   const shake = useSharedValue(0);
   const pop = useSharedValue(1);
@@ -90,10 +93,12 @@ export function OptionButton({ letter, label, state, onPress }: Props) {
         style={[styles.button, responsiveStyles.button, stateStyle]}
       >
         <View style={[styles.badge, responsiveStyles.badge]}>
-          <Text style={styles.badgeText}>{letter}</Text>
+          <Text style={[styles.badgeText, responsiveStyles.badgeText]}>
+            {letter}
+          </Text>
         </View>
         <Text
-          style={styles.label}
+          style={[styles.label, responsiveStyles.label]}
           numberOfLines={2}
           adjustsFontSizeToFit
           minimumFontScale={0.75}

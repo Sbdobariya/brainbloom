@@ -8,19 +8,23 @@ type Props = { letter: string; used: boolean; onPress: () => void };
 export function LetterTile({ letter, used, onPress }: Props) {
   const { s } = useResponsive();
   const tileSize = Math.max(56, s(64));
-  const fontSize = Math.max(24, s(30));
+  const responsiveStyles = StyleSheet.create({
+    tile: {
+      width: tileSize,
+      height: tileSize,
+      borderWidth: s(2),
+      borderRadius: s(radius.md),
+    },
+    letter: { fontSize: Math.max(24, s(30)) },
+  });
 
   return (
     <PressableScale
       onPress={onPress}
       disabled={used}
-      style={[
-        styles.tile,
-        { width: tileSize, height: tileSize },
-        used && styles.used,
-      ]}
+      style={[styles.tile, responsiveStyles.tile, used && styles.used]}
     >
-      <Text style={[styles.letter, { fontSize }]}>{letter}</Text>
+      <Text style={[styles.letter, responsiveStyles.letter]}>{letter}</Text>
     </PressableScale>
   );
 }
@@ -31,8 +35,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 2,
-    borderRadius: radius.md,
   },
   used: { opacity: 0.25 },
   letter: { ...typography.heading, color: colors.text },

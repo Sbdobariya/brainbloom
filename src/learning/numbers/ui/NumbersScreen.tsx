@@ -2,6 +2,7 @@ import { haptic, playSound, speak } from "@/core/audio/feedback";
 import { GameScreen } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -30,6 +31,33 @@ type CardProps = { item: NumberItem; color: string; dir: 1 | -1 };
 
 // Re-created (via key) for every number, so its state starts fresh each time
 function NumberCard({ item, color, dir }: CardProps) {
+  const { s } = useResponsive();
+  const itemSize = Math.max(48, s(64));
+  const itemGap = s(spacing.xs);
+  const itemRows = Math.ceil(item.n / 5);
+  const responsiveStyles = StyleSheet.create({
+    card: {
+      gap: s(spacing.sm),
+      paddingVertical: s(spacing.xl),
+      paddingHorizontal: s(spacing.md),
+      borderWidth: s(3),
+      borderRadius: s(radius.lg),
+    },
+    numeral: { fontSize: s(110), lineHeight: s(120) },
+    word: { fontSize: s(typography.title.fontSize) },
+    items: {
+      width: itemSize * 5 + itemGap * 4,
+      minHeight: itemRows * itemSize + Math.max(0, itemRows - 1) * itemGap,
+      gap: itemGap,
+      marginTop: s(spacing.md),
+    },
+    itemRow: { flexDirection: "row", gap: itemGap },
+    tip: {
+      fontSize: s(typography.body.fontSize),
+      marginTop: s(spacing.md),
+      minHeight: s(22),
+    },
+  });
   const [counted, setCounted] = useState<number[]>([]); // item indexes, in tap order
   const x = useSharedValue(dir * 90);
   const opacity = useSharedValue(0);
@@ -75,25 +103,46 @@ function NumberCard({ item, color, dir }: CardProps) {
   const done = counted.length === item.n;
 
   return (
-    <Animated.View style={[styles.card, { borderColor: color }, cardStyle]}>
-      <Animated.Text style={[styles.numeral, { color }, numeralStyle]}>
+    <Animated.View
+      style={[
+        styles.card,
+        responsiveStyles.card,
+        { borderColor: color },
+        cardStyle,
+      ]}
+    >
+      <Animated.Text
+        style={[
+          styles.numeral,
+          responsiveStyles.numeral,
+          { color },
+          numeralStyle,
+        ]}
+      >
         {item.n}
       </Animated.Text>
-      <Text style={styles.word}>{item.word}</Text>
+      <Text style={[styles.word, responsiveStyles.word]}>{item.word}</Text>
 
-      <View style={styles.items}>
-        {Array.from({ length: item.n }, (_, i) => (
-          <CountItem
-            key={i}
-            emoji={item.emoji}
-            color={color}
-            order={counted.includes(i) ? counted.indexOf(i) + 1 : null}
-            onPress={() => onCount(i)}
-          />
+      <View style={[styles.items, responsiveStyles.items]}>
+        {Array.from({ length: itemRows }, (_, row) => (
+          <View key={row} style={responsiveStyles.itemRow}>
+            {Array.from({ length: Math.min(5, item.n - row * 5) }, (_, col) => {
+              const i = row * 5 + col;
+              return (
+                <CountItem
+                  key={i}
+                  emoji={item.emoji}
+                  color={color}
+                  order={counted.includes(i) ? counted.indexOf(i) + 1 : null}
+                  onPress={() => onCount(i)}
+                />
+              );
+            })}
+          </View>
         ))}
       </View>
 
-      <Text style={styles.tip}>
+      <Text style={[styles.tip, responsiveStyles.tip]}>
         {done ? "Great counting! 🎉" : "Tap each picture to count 👆"}
       </Text>
     </Animated.View>
@@ -101,6 +150,27 @@ function NumberCard({ item, color, dir }: CardProps) {
 }
 
 export function NumbersScreen() {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    progress: {
+      marginTop: s(spacing.lg),
+      fontSize: s(typography.caption.fontSize),
+    },
+    nav: { paddingBottom: s(spacing.xl) },
+    navButton: {
+      width: Math.max(56, s(72)),
+      height: Math.max(56, s(72)),
+      borderWidth: s(2),
+      borderRadius: s(radius.pill),
+    },
+    speaker: {
+      width: Math.max(56, s(88)),
+      height: Math.max(56, s(88)),
+      borderRadius: s(radius.pill),
+    },
+    navText: { fontSize: s(26) },
+    speakerText: { fontSize: s(38) },
+  });
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<1 | -1>(1);
 
@@ -117,7 +187,7 @@ export function NumbersScreen() {
 
   return (
     <GameScreen title="🔢 123" subtitle="Learn to count">
-      <Text style={styles.progress}>
+      <Text style={[styles.progress, responsiveStyles.progress]}>
         {index + 1} / {numbers.length}
       </Text>
 
@@ -125,34 +195,41 @@ export function NumbersScreen() {
         <NumberCard key={index} item={item} color={color} dir={dir} />
       </View>
 
-      <View style={styles.nav}>
+      <View style={[styles.nav, responsiveStyles.nav]}>
         <PressableScale
-          style={[styles.navButton, index === 0 && styles.navDisabled]}
+          style={[
+            styles.navButton,
+            responsiveStyles.navButton,
+            index === 0 && styles.navDisabled,
+          ]}
           disabled={index === 0}
           haptic={false}
           onPress={() => go(-1)}
         >
-          <Text style={styles.navText}>◀</Text>
+          <Text style={[styles.navText, responsiveStyles.navText]}>◀</Text>
         </PressableScale>
 
         <PressableScale
-          style={styles.speaker}
+          style={[styles.speaker, responsiveStyles.speaker]}
           haptic={false}
           onPress={() => speak(`${CAPITAL(item.word)}. Can you count them?`)}
         >
-          <Text style={styles.speakerText}>🔊</Text>
+          <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+            🔊
+          </Text>
         </PressableScale>
 
         <PressableScale
           style={[
             styles.navButton,
+            responsiveStyles.navButton,
             index === numbers.length - 1 && styles.navDisabled,
           ]}
           disabled={index === numbers.length - 1}
           haptic={false}
           onPress={() => go(1)}
         >
-          <Text style={styles.navText}>▶</Text>
+          <Text style={[styles.navText, responsiveStyles.navText]}>▶</Text>
         </PressableScale>
       </View>
     </GameScreen>
@@ -164,59 +241,39 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
     textAlign: "center",
-    marginTop: spacing.lg,
   },
-  stage: { flex: 1, justifyContent: "center", overflow: "hidden" },
+  stage: { flex: 1, justifyContent: "center" },
   card: {
     alignItems: "center",
-    gap: spacing.sm,
-    paddingVertical: spacing.xl,
-    paddingHorizontal: spacing.md,
     backgroundColor: colors.card,
-    borderWidth: 3,
-    borderRadius: radius.lg,
   },
-  numeral: { ...typography.title, fontSize: 110, lineHeight: 120 },
+  numeral: { ...typography.title },
   word: { ...typography.title, color: colors.text },
   items: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: "column",
     justifyContent: "center",
-    width: 5 * 68,
-    marginTop: spacing.md,
-    minHeight: 64,
   },
   tip: {
     ...typography.body,
     color: colors.teal,
-    marginTop: spacing.md,
-    minHeight: 22,
   },
   nav: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingBottom: spacing.xl,
   },
   navButton: {
-    width: 72,
-    height: 72,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 2,
-    borderRadius: radius.pill,
   },
   navDisabled: { opacity: 0.3 },
-  navText: { color: colors.text, fontSize: 26 },
+  navText: { color: colors.text },
   speaker: {
-    width: 88,
-    height: 88,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.purple,
-    borderRadius: radius.pill,
   },
-  speakerText: { fontSize: 38 },
+  speakerText: {},
 });

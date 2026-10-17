@@ -20,11 +20,14 @@ const LETTERS = ["A", "B", "C", "D"];
 type Status = "playing" | "correct" | "wrong" | "timeout";
 
 export function QuizGame() {
-  const { s } = useResponsive();
+  const { width, contentWidth, padding, s } = useResponsive();
+  const optionsGap = s(spacing.md);
+  const availableWidth = Math.min(width, contentWidth) - padding * 2;
+  const optionWidth = Math.floor((availableWidth - optionsGap) / 2);
   const responsiveStyles = StyleSheet.create({
     row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
     timer: { gap: s(spacing.md), marginTop: s(spacing.lg) },
-    seconds: { width: s(36) },
+    seconds: { width: s(36), fontSize: s(typography.caption.fontSize) },
     card: {
       marginTop: s(spacing.lg),
       padding: s(spacing.xl),
@@ -33,12 +36,19 @@ export function QuizGame() {
       borderWidth: s(1),
       borderRadius: s(radius.lg),
     },
+    prompt: { fontSize: s(typography.title.fontSize) },
+    message: {
+      fontSize: s(typography.body.fontSize),
+      minHeight: s(22),
+    },
     tag: {
       paddingHorizontal: s(spacing.md),
       paddingVertical: s(spacing.xs),
       borderRadius: s(radius.pill),
     },
-    options: { rowGap: s(spacing.md), marginTop: s(spacing.lg) },
+    tagText: { fontSize: s(typography.caption.fontSize) },
+    options: { gap: optionsGap, marginTop: s(spacing.lg) },
+    optionRow: { flexDirection: "row", gap: optionsGap },
     lifelines: { gap: s(spacing.sm), paddingBottom: s(spacing.xl) },
   });
   const [questions, setQuestions] = useState(() =>
@@ -199,23 +209,43 @@ export function QuizGame() {
 
       <View style={[styles.card, responsiveStyles.card]}>
         <View style={[styles.tag, responsiveStyles.tag]}>
-          <Text style={styles.tagText}>
+          <Text
+            style={[styles.tagText, responsiveStyles.tagText]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
             {info.emoji} {info.title.toUpperCase()}
           </Text>
         </View>
-        <Text style={styles.prompt}>{q.prompt}</Text>
-        <Text style={styles.message}>{message}</Text>
+        <Text
+          style={[styles.prompt, responsiveStyles.prompt]}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+        >
+          {q.prompt}
+        </Text>
+        <Text style={[styles.message, responsiveStyles.message]}>
+          {message}
+        </Text>
       </View>
 
       <View style={[styles.options, responsiveStyles.options]}>
-        {q.options.map((o, i) => (
-          <OptionButton
-            key={`${q.id}-${i}`}
-            letter={LETTERS[i]}
-            label={o}
-            state={optionState(i)}
-            onPress={() => onAnswer(i)}
-          />
+        {Array.from({ length: Math.ceil(q.options.length / 2) }, (_, row) => (
+          <View key={row} style={responsiveStyles.optionRow}>
+            {q.options.slice(row * 2, row * 2 + 2).map((o, col) => {
+              const i = row * 2 + col;
+              return (
+                <OptionButton
+                  key={`${q.id}-${i}`}
+                  width={optionWidth}
+                  letter={LETTERS[i]}
+                  label={o}
+                  state={optionState(i)}
+                  onPress={() => onAnswer(i)}
+                />
+              );
+            })}
+          </View>
         ))}
       </View>
 
@@ -266,7 +296,6 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   card: {
-    minHeight: 170,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: colors.card,
@@ -277,11 +306,9 @@ const styles = StyleSheet.create({
   },
   tagText: { ...typography.caption, color: colors.yellow, letterSpacing: 1 },
   prompt: { ...typography.title, color: colors.text, textAlign: "center" },
-  message: { ...typography.body, color: colors.teal, minHeight: 22 },
+  message: { ...typography.body, color: colors.teal },
   options: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+    flexDirection: "column",
   },
   lifelines: {
     flexDirection: "row",

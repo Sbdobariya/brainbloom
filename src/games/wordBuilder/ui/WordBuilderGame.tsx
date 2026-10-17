@@ -30,6 +30,31 @@ const SECONDS_PER_ROUND = 30;
 
 export function WordBuilderGame() {
   const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
+    timer: { gap: s(spacing.md), marginTop: s(spacing.lg) },
+    seconds: {
+      width: Math.max(28, s(36)),
+      fontSize: s(typography.caption.fontSize),
+    },
+    card: {
+      marginTop: s(spacing.lg),
+      padding: s(spacing.xl),
+      gap: s(spacing.md),
+      borderWidth: s(1),
+      borderRadius: s(radius.lg),
+    },
+    category: { fontSize: s(typography.caption.fontSize) },
+    emoji: { fontSize: Math.max(46, s(64)) },
+    tray: { gap: s(spacing.md), marginTop: s(spacing.xl) },
+    footer: { paddingBottom: s(spacing.xl) },
+    shuffle: {
+      width: Math.max(48, s(48)),
+      height: Math.max(48, s(48)),
+      borderRadius: s(radius.pill),
+    },
+    shuffleText: { fontSize: s(22) },
+  });
   const [round, setRound] = useState(() => pickRound(ROUNDS));
   const [roundIndex, setRoundIndex] = useState(0);
   const [placed, setPlaced] = useState<Tile[]>([]);
@@ -151,26 +176,25 @@ export function WordBuilderGame() {
           ? "Here is the word!"
           : `Build the word (${entry.word.length} letters)`;
 
-  const timerWidth = Math.max(28, s(36));
-  const emojiSize = Math.max(46, s(64));
-
   return (
     <GameScreen
       title="Word Builder"
       subtitle="Spelling Challenge"
       right={
         <PressableScale
-          style={styles.shuffle}
+          style={[styles.shuffle, responsiveStyles.shuffle]}
           onPress={() => {
             setPlaced([]);
             setShuffleKey((k) => k + 1);
           }}
         >
-          <Text style={styles.shuffleText}>🔀</Text>
+          <Text style={[styles.shuffleText, responsiveStyles.shuffleText]}>
+            🔀
+          </Text>
         </PressableScale>
       }
     >
-      <View style={styles.row}>
+      <View style={[styles.row, responsiveStyles.row]}>
         <StatChip label="SCORE" value={score} color={colors.yellow} />
         <StatChip
           label="ROUND"
@@ -180,19 +204,19 @@ export function WordBuilderGame() {
         <StatChip label="STREAK" value={streak} color={colors.pink} />
       </View>
 
-      <View style={styles.timer}>
+      <View style={[styles.timer, responsiveStyles.timer]}>
         {/* key remounts the bar each round so it snaps back to full */}
         <TimerBar key={roundIndex} progress={secondsLeft / SECONDS_PER_ROUND} />
-        <Text style={[styles.seconds, { width: timerWidth }]}>
+        <Text style={[styles.seconds, responsiveStyles.seconds]}>
           {Math.max(secondsLeft, 0)}s
         </Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.category}>
+      <View style={[styles.card, responsiveStyles.card]}>
+        <Text style={[styles.category, responsiveStyles.category]}>
           {info.emoji} {info.title.toUpperCase()}
         </Text>
-        <Text style={[styles.emoji, { fontSize: emojiSize }]}>
+        <Text style={[styles.emoji, responsiveStyles.emoji]}>
           {entry.emoji}
         </Text>
         <Text style={styles.message}>{message}</Text>
@@ -203,7 +227,7 @@ export function WordBuilderGame() {
         />
       </View>
 
-      <View style={styles.tray}>
+      <View style={[styles.tray, responsiveStyles.tray]}>
         {tiles.map((t) => (
           <LetterTile
             key={t.id}
@@ -214,7 +238,7 @@ export function WordBuilderGame() {
         ))}
       </View>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, responsiveStyles.footer]}>
         <GradientButton
           label="Check"
           colors={gradients.cool}
@@ -238,12 +262,10 @@ export function WordBuilderGame() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.lg },
+  row: { flexDirection: "row" },
   timer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.md,
-    marginTop: spacing.lg,
   },
   seconds: {
     ...typography.caption,
@@ -251,33 +273,23 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   card: {
-    marginTop: spacing.lg,
-    padding: spacing.xl,
     alignItems: "center",
-    gap: spacing.md,
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 1,
-    borderRadius: radius.lg,
   },
   category: { ...typography.caption, color: colors.purple, letterSpacing: 1 },
-  emoji: { fontSize: 64 },
+  emoji: {},
   message: { ...typography.body, color: colors.teal },
   tray: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    gap: spacing.md,
-    marginTop: spacing.xl,
   },
-  footer: { flex: 1, justifyContent: "flex-end", paddingBottom: spacing.xl },
+  footer: { flex: 1, justifyContent: "flex-end" },
   shuffle: {
-    width: 48,
-    height: 48,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.card,
-    borderRadius: radius.pill,
   },
-  shuffleText: { fontSize: 22 },
+  shuffleText: {},
 });

@@ -35,6 +35,7 @@ export function GradientButton({
       paddingHorizontal: s(MIN_TOUCH),
       borderRadius: s(radius.lg),
     },
+    label: { fontSize: s(typography.heading.fontSize) },
   });
 
   return (
@@ -54,7 +55,14 @@ export function GradientButton({
         end={{ x: 1, y: 0 }}
         style={[styles.gradient, responsiveStyles.gradient]}
       >
-        <Text style={styles.label}>{label}</Text>
+        <Text
+          style={[styles.label, responsiveStyles.label]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+        >
+          {label}
+        </Text>
       </LinearGradient>
     </PressableScale>
   );

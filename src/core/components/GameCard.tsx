@@ -56,6 +56,9 @@ export function GameCard({
       paddingHorizontal: s(spacing.sm),
       paddingVertical: s(spacing.xs),
     } as ViewStyle,
+    title: { fontSize: s(typography.heading.fontSize) } as TextStyle,
+    stars: { fontSize: s(typography.caption.fontSize) } as TextStyle,
+    badgeText: { fontSize: s(typography.caption.fontSize) } as TextStyle,
   });
   const progress = useSharedValue(0);
 
@@ -86,7 +89,7 @@ export function GameCard({
         >
           <Text style={responsiveStyles.emoji}>{emoji}</Text>
           <Text
-            style={styles.title}
+            style={[styles.title, responsiveStyles.title]}
             numberOfLines={2}
             adjustsFontSizeToFit
             minimumFontScale={0.75}
@@ -94,11 +97,15 @@ export function GameCard({
             {title}
           </Text>
           {stars !== undefined && stars > 0 && (
-            <Text style={styles.stars}>{stars}/3 ⭐</Text>
+            <Text style={[styles.stars, responsiveStyles.stars]}>
+              {stars}/3 ⭐
+            </Text>
           )}
           {locked && (
             <View style={[styles.badge, responsiveStyles.badge]}>
-              <Text style={styles.badgeText}>Soon</Text>
+              <Text style={[styles.badgeText, responsiveStyles.badgeText]}>
+                Soon
+              </Text>
             </View>
           )}
         </LinearGradient>

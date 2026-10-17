@@ -25,32 +25,62 @@ export default function Home() {
       right: padding,
       width: Math.max(56, s(48)),
       height: Math.max(56, s(48)),
+      borderRadius: s(radius.pill),
     },
     stats: { gap, marginBottom: s(spacing.xl) },
     learnHeadingRow: { marginBottom: s(spacing.md) },
     learnScroll: { marginHorizontal: -padding },
     learnContent: { gap, paddingLeft: padding, paddingRight: padding },
     grid: {
+      flexDirection: "column",
       width: cardWidth * columns + gap * (columns - 1),
       columnGap: gap,
     },
     title: { marginTop: s(spacing.lg) },
     subtitle: { marginBottom: s(spacing.md) },
     sectionHeading: { marginBottom: s(spacing.md) },
+    titleText: { fontSize: s(typography.title.fontSize) },
+    subtitleText: { fontSize: s(typography.body.fontSize) },
+    sectionText: { fontSize: s(typography.heading.fontSize) },
+    learnHintText: { fontSize: s(typography.caption.fontSize) },
+    settingsIcon: { fontSize: s(typography.heading.fontSize) },
+    gridRow: { flexDirection: "row", columnGap: gap },
   });
   const totalStars = useProgress(selectTotalStars);
   const stars = useProgress((state) => state.stars);
   const streak = useProgress((state) => state.streak);
+  const gameRows = Array.from(
+    { length: Math.ceil(games.length / columns) },
+    (_, row) => games.slice(row * columns, (row + 1) * columns),
+  );
 
   return (
     <AnimatedBackground>
       <SafeAreaView style={styles.safe}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={[styles.content, responsiveStyles.content]}>
-            <Text style={[styles.title, responsiveStyles.title]}>
+            <Text
+              style={[
+                styles.title,
+                responsiveStyles.title,
+                responsiveStyles.titleText,
+              ]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
               BrainBloom
             </Text>
-            <Text style={[styles.subtitle, responsiveStyles.subtitle]}>
+            <Text
+              style={[
+                styles.subtitle,
+                responsiveStyles.subtitle,
+                responsiveStyles.subtitleText,
+              ]}
+              numberOfLines={2}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
               Pick a game and start playing!
             </Text>
             <View style={[styles.stats, responsiveStyles.stats]}>
@@ -63,10 +93,20 @@ export default function Home() {
             <View
               style={[styles.learnHeadingRow, responsiveStyles.learnHeadingRow]}
             >
-              <Text style={[styles.sectionHeading, styles.learnHeading]}>
+              <Text
+                style={[
+                  styles.sectionHeading,
+                  styles.learnHeading,
+                  responsiveStyles.sectionText,
+                ]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
                 📚 Learn
               </Text>
-              <Text style={styles.learnHint}>Swipe →</Text>
+              <Text style={[styles.learnHint, responsiveStyles.learnHintText]}>
+                Swipe →
+              </Text>
             </View>
             <ScrollView
               horizontal
@@ -96,23 +136,36 @@ export default function Home() {
               ))}
             </ScrollView>
             <Text
-              style={[styles.sectionHeading, responsiveStyles.sectionHeading]}
+              style={[
+                styles.sectionHeading,
+                responsiveStyles.sectionHeading,
+                responsiveStyles.sectionText,
+              ]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
             >
               🎮 Games
             </Text>
             <View style={[styles.grid, responsiveStyles.grid]}>
-              {games.map((g, i) => (
-                <GameCard
-                  key={g.id}
-                  title={g.title}
-                  emoji={g.emoji}
-                  gradient={g.gradient}
-                  stars={stars[g.id] ?? 0}
-                  locked={!g.ready}
-                  index={i}
-                  width={cardWidth}
-                  onPress={() => g.ready && router.push(g.route as Href)}
-                />
+              {gameRows.map((row, rowIndex) => (
+                <View key={rowIndex} style={responsiveStyles.gridRow}>
+                  {row.map((g, colIndex) => {
+                    const index = rowIndex * columns + colIndex;
+                    return (
+                      <GameCard
+                        key={g.id}
+                        title={g.title}
+                        emoji={g.emoji}
+                        gradient={g.gradient}
+                        stars={stars[g.id] ?? 0}
+                        locked={!g.ready}
+                        index={index}
+                        width={cardWidth}
+                        onPress={() => g.ready && router.push(g.route as Href)}
+                      />
+                    );
+                  })}
+                </View>
               ))}
             </View>
           </View>
@@ -121,7 +174,9 @@ export default function Home() {
           style={[styles.settingsButton, responsiveStyles.settingsButton]}
           onPress={() => router.push("/settings")}
         >
-          <Text style={styles.settingsIcon}>⚙️</Text>
+          <Text style={[styles.settingsIcon, responsiveStyles.settingsIcon]}>
+            ⚙️
+          </Text>
         </PressableScale>
       </SafeAreaView>
     </AnimatedBackground>
@@ -139,7 +194,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.pill,
   },
   settingsIcon: { ...typography.heading, color: colors.text },
   sectionHeading: {
@@ -154,26 +208,20 @@ const styles = StyleSheet.create({
   },
   learnHeading: { marginBottom: 0 },
   learnHint: { ...typography.caption, color: colors.textMuted },
-  learnScroll: { marginHorizontal: -spacing.lg },
-  learnContent: { gap: spacing.md, paddingRight: spacing.lg },
+  learnScroll: {},
+  learnContent: {},
   title: {
     ...typography.title,
     color: colors.text,
     textAlign: "center",
-    marginTop: spacing.lg,
   },
   subtitle: {
     ...typography.body,
     color: colors.textMuted,
     textAlign: "center",
-    marginBottom: spacing.md,
   },
   stats: {
     flexDirection: "row",
   },
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-  },
+  grid: {},
 });

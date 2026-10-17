@@ -14,6 +14,10 @@ export function EmojiPop({ emoji, index }: Props) {
   const { s: scaleSize } = useResponsive();
   const pop = useSharedValue(0);
   const cellSize = Math.max(56, scaleSize(64));
+  const responsiveStyles = StyleSheet.create({
+    emoji: { fontSize: scaleSize(44) },
+    cell: { width: cellSize, height: cellSize, lineHeight: cellSize },
+  });
 
   useEffect(() => {
     // Each picture pops in a moment after the one before it
@@ -35,7 +39,8 @@ export function EmojiPop({ emoji, index }: Props) {
     <Animated.Text
       style={[
         styles.emoji,
-        { width: cellSize, height: cellSize, lineHeight: cellSize },
+        responsiveStyles.emoji,
+        responsiveStyles.cell,
         style,
       ]}
     >
@@ -46,11 +51,7 @@ export function EmojiPop({ emoji, index }: Props) {
 
 const styles = StyleSheet.create({
   emoji: {
-    fontSize: 44,
-    width: 64,
-    height: 64,
     textAlign: "center",
     textAlignVertical: "center",
-    lineHeight: 64,
   },
 });

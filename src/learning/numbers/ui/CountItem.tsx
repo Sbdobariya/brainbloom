@@ -22,8 +22,19 @@ export function CountItem({ emoji, order, color, onPress }: Props) {
   const { s } = useResponsive();
   const pop = useSharedValue(1);
   const badge = useSharedValue(0);
-  const itemSize = Math.max(52, s(64));
-  const badgeSize = Math.max(18, s(24));
+  const itemSize = Math.max(56, s(64));
+  const badgeSize = Math.max(24, s(24));
+  const responsiveStyles = StyleSheet.create({
+    item: { width: itemSize, height: itemSize },
+    emoji: { fontSize: s(44) },
+    badge: {
+      minWidth: badgeSize,
+      height: badgeSize,
+      borderRadius: badgeSize / 2,
+      paddingHorizontal: s(4),
+    },
+    badgeText: { fontSize: s(14) },
+  });
 
   useEffect(() => {
     if (order !== null) {
@@ -53,21 +64,29 @@ export function CountItem({ emoji, order, color, onPress }: Props) {
       disabled={order !== null}
       haptic={false}
       scaleTo={0.88}
-      style={[styles.item, { width: itemSize, height: itemSize }]}
+      style={[styles.item, responsiveStyles.item]}
     >
       <Animated.Text
-        style={[styles.emoji, order !== null && styles.counted, emojiStyle]}
+        style={[
+          styles.emoji,
+          responsiveStyles.emoji,
+          order !== null && styles.counted,
+          emojiStyle,
+        ]}
       >
         {emoji}
       </Animated.Text>
       <Animated.View
         style={[
           styles.badge,
-          { backgroundColor: color, minWidth: badgeSize, height: badgeSize },
+          responsiveStyles.badge,
+          { backgroundColor: color },
           badgeStyle,
         ]}
       >
-        <Text style={styles.badgeText}>{order ?? ""}</Text>
+        <Text style={[styles.badgeText, responsiveStyles.badgeText]}>
+          {order ?? ""}
+        </Text>
       </Animated.View>
     </PressableScale>
   );
@@ -78,16 +97,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  emoji: { fontSize: 44 },
+  emoji: {},
   counted: { opacity: 0.85 },
   badge: {
     position: "absolute",
     right: 0,
     bottom: 0,
-    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 4,
   },
-  badgeText: { ...typography.caption, fontSize: 14, color: colors.bg },
+  badgeText: { ...typography.caption, color: colors.bg },
 });

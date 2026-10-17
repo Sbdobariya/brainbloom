@@ -37,6 +37,16 @@ const PALETTE = [
 
 export function WaterSortGame() {
   const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
+    tubes: {
+      columnGap: s(spacing.lg),
+      rowGap: s(spacing.xl),
+      marginTop: s(spacing.xxl),
+      paddingTop: s(spacing.lg),
+    },
+    footer: { paddingBottom: s(spacing.xl) },
+  });
   const [level, setLevel] = useState(1);
   const [tubes, setTubes] = useState<Tube[]>(() => createLevel(1));
   const [history, setHistory] = useState<Tube[][]>([]);
@@ -129,7 +139,7 @@ export function WaterSortGame() {
     setSelected(null);
   };
 
-  const tubeWidth = Math.max(42, s(56));
+  const tubeWidth = Math.max(48, s(56));
   const tubeHeight = Math.max(120, s(190));
 
   return (
@@ -137,7 +147,7 @@ export function WaterSortGame() {
       title="Water Sort"
       subtitle={`Level ${level} · Sort ${colorCount} colors!`}
     >
-      <View style={styles.row}>
+      <View style={[styles.row, responsiveStyles.row]}>
         <StatChip label="MOVES" value={moves} color={colors.blue} />
         <StatChip
           label="SOLVED"
@@ -147,7 +157,7 @@ export function WaterSortGame() {
         <StatChip label="LEVEL" value={level} color={colors.yellow} />
       </View>
 
-      <View style={styles.tubes}>
+      <View style={[styles.tubes, responsiveStyles.tubes]}>
         {tubes.map((tube, i) => (
           <LiquidTube
             key={i}
@@ -160,8 +170,8 @@ export function WaterSortGame() {
         ))}
       </View>
 
-      <View style={styles.footer}>
-        <View style={styles.row}>
+      <View style={[styles.footer, responsiveStyles.footer]}>
+        <View style={[styles.row, responsiveStyles.row]}>
           <View style={styles.flex}>
             <GradientButton
               label="↩️ Undo"
@@ -191,16 +201,12 @@ export function WaterSortGame() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.lg },
+  row: { flexDirection: "row" },
   flex: { flex: 1 },
   tubes: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    columnGap: spacing.lg,
-    rowGap: spacing.xl,
-    marginTop: spacing.xxl,
-    paddingTop: spacing.lg,
   },
-  footer: { flex: 1, justifyContent: "flex-end", paddingBottom: spacing.xl },
+  footer: { flex: 1, justifyContent: "flex-end" },
 });

@@ -47,12 +47,16 @@ export function ResultModal({
       maxHeight: height - s(spacing.xl) * 2,
       padding: s(spacing.xl),
       borderRadius: s(radius.lg),
+      borderWidth: s(2),
     },
     content: { alignItems: "center", paddingBottom: s(spacing.xs) },
     lottie: { width: s(180), height: s(180) },
     subtitle: { marginTop: s(spacing.sm) },
     actions: { gap: s(spacing.md), marginTop: s(spacing.xl) },
     exit: { minHeight: Math.max(56, s(48)), borderRadius: s(radius.lg) },
+    titleText: { fontSize: s(typography.title.fontSize) },
+    subtitleText: { fontSize: s(typography.body.fontSize) },
+    exitText: { fontSize: s(typography.heading.fontSize) },
   });
   const backdrop = useSharedValue(0);
   const card = useSharedValue(0);
@@ -86,9 +90,25 @@ export function ResultModal({
             loop={kind !== "win"}
             style={[styles.lottie, responsiveStyles.lottie]}
           />
-          <Text style={styles.title}>{title}</Text>
+          <Text
+            style={[styles.title, responsiveStyles.titleText]}
+            numberOfLines={2}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+          >
+            {title}
+          </Text>
           {subtitle ? (
-            <Text style={[styles.subtitle, responsiveStyles.subtitle]}>
+            <Text
+              style={[
+                styles.subtitle,
+                responsiveStyles.subtitle,
+                responsiveStyles.subtitleText,
+              ]}
+              numberOfLines={2}
+              adjustsFontSizeToFit
+              minimumFontScale={0.75}
+            >
               {subtitle}
             </Text>
           ) : null}
@@ -100,7 +120,9 @@ export function ResultModal({
               sound
               style={[styles.exit, responsiveStyles.exit]}
             >
-              <Text style={styles.exitText}>Exit</Text>
+              <Text style={[styles.exitText, responsiveStyles.exitText]}>
+                Exit
+              </Text>
             </PressableScale>
           </View>
         </ScrollView>
@@ -118,7 +140,6 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 2,
     alignItems: "center",
   },
   lottie: {},

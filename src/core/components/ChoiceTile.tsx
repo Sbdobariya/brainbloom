@@ -34,7 +34,7 @@ export function ChoiceTile({
   const { s } = useResponsive();
   const responsiveStyles = StyleSheet.create({
     tile: {
-      minHeight: s(110),
+      minHeight: Math.max(48, s(110)),
       borderWidth: s(3),
       borderRadius: s(radius.lg),
     },
@@ -115,6 +115,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: colors.card,
   },
-  letter: { ...typography.title, fontSize: 56 },
+  letter: { ...typography.title },
   swatch: { alignItems: "center", justifyContent: "center" },
 });

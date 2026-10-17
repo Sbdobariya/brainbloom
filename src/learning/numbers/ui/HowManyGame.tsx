@@ -24,6 +24,30 @@ const CAPITAL = (w: string) => w[0].toUpperCase() + w.slice(1);
 
 export function HowManyGame() {
   const { s } = useResponsive();
+  const itemSize = Math.max(56, s(64));
+  const itemGap = s(spacing.xs);
+  const responsiveStyles = StyleSheet.create({
+    row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
+    card: {
+      marginTop: s(spacing.xl),
+      gap: s(spacing.md),
+      paddingVertical: s(spacing.xl),
+      paddingHorizontal: s(spacing.md),
+      minHeight: s(270),
+      borderWidth: s(1),
+      borderRadius: s(radius.lg),
+    },
+    items: { width: itemSize * 5 + itemGap * 4, gap: itemGap },
+    itemRow: { flexDirection: "row", gap: itemGap },
+    question: { fontSize: s(typography.heading.fontSize) },
+    speaker: {
+      width: Math.max(56, s(56)),
+      height: Math.max(56, s(56)),
+      borderRadius: s(radius.pill),
+    },
+    speakerText: { fontSize: s(26) },
+    choices: { gap: s(spacing.md), marginTop: s(spacing.xl) },
+  });
   const [rounds, setRounds] = useState(() => makeCountRounds(ROUNDS, OPTIONS));
   const [index, setIndex] = useState(0);
   const [wrong, setWrong] = useState<number[]>([]);
@@ -34,8 +58,6 @@ export function HowManyGame() {
   const round = rounds[index];
   const { item, n } = round;
   const stars = starsFromRatio(firstTry / ROUNDS);
-  const itemWidth = Math.max(56, s(68));
-
   const ask = () => speak(`How many ${item.plural} are there?`);
 
   // Ask the question when each round starts
@@ -97,7 +119,7 @@ export function HowManyGame() {
 
   return (
     <GameScreen title="🧮 How Many?" subtitle="Count and tap">
-      <View style={styles.row}>
+      <View style={[styles.row, responsiveStyles.row]}>
         <StatChip
           label="ROUND"
           value={`${index + 1}/${ROUNDS}`}
@@ -106,22 +128,33 @@ export function HowManyGame() {
         <StatChip label="FIRST TRY" value={firstTry} color={colors.yellow} />
       </View>
 
-      <View style={styles.card}>
+      <View style={[styles.card, responsiveStyles.card]}>
         {/* key remounts the group so the pop-in replays every round */}
-        <View key={index} style={[styles.items, { width: itemWidth * 5 }]}>
-          {Array.from({ length: n }, (_, i) => (
-            <EmojiPop key={i} emoji={item.emoji} index={i} />
+        <View key={index} style={[styles.items, responsiveStyles.items]}>
+          {Array.from({ length: Math.ceil(n / 5) }, (_, row) => (
+            <View key={row} style={responsiveStyles.itemRow}>
+              {Array.from({ length: Math.min(5, n - row * 5) }, (_, col) => {
+                const i = row * 5 + col;
+                return <EmojiPop key={i} emoji={item.emoji} index={i} />;
+              })}
+            </View>
           ))}
         </View>
-        <Text style={styles.question}>
+        <Text style={[styles.question, responsiveStyles.question]}>
           {solved ? "Great job! 🎉" : `How many ${item.plural}?`}
         </Text>
-        <PressableScale style={styles.speaker} haptic={false} onPress={ask}>
-          <Text style={styles.speakerText}>🔊</Text>
+        <PressableScale
+          style={[styles.speaker, responsiveStyles.speaker]}
+          haptic={false}
+          onPress={ask}
+        >
+          <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+            🔊
+          </Text>
         </PressableScale>
       </View>
 
-      <View style={styles.choices}>
+      <View style={[styles.choices, responsiveStyles.choices]}>
         {round.options.map((value, i) => (
           <ChoiceTile
             key={`${index}-${i}`}
@@ -154,35 +187,23 @@ export function HowManyGame() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.lg },
+  row: { flexDirection: "row" },
   card: {
-    marginTop: spacing.xl,
     alignItems: "center",
-    gap: spacing.md,
-    paddingVertical: spacing.xl,
-    paddingHorizontal: spacing.md,
-    minHeight: 270,
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 1,
-    borderRadius: radius.lg,
   },
   items: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: "column",
     justifyContent: "center",
-    minHeight: 136,
     alignContent: "center",
   },
   question: { ...typography.heading, color: colors.teal, textAlign: "center" },
   speaker: {
-    width: 56,
-    height: 56,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.purple,
-    borderRadius: radius.pill,
   },
-  speakerText: { fontSize: 26 },
-  choices: { flexDirection: "row", gap: spacing.md, marginTop: spacing.xl },
+  speakerText: {},
+  choices: { flexDirection: "row" },
 });

@@ -8,7 +8,7 @@ import {
   Skia,
 } from "@shopify/react-native-skia";
 import React, { useMemo, useRef } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import type { Level, Paths } from "../logic/freeFlow";
 
@@ -35,7 +35,10 @@ export function FreeFlowBoard({
   const { s } = useResponsive();
   const gridInset = s(2);
   const gridRadius = s(10);
-  const cell = boardPx / size;
+  const cell = Math.floor(boardPx / size);
+  const responsiveStyles = StyleSheet.create({
+    board: { width: boardPx, height: boardPx },
+  });
 
   // The gesture is created once. It calls the latest handlers through a ref,
   // so a re-render in the middle of a drag never uses stale state or resets it.
@@ -86,8 +89,8 @@ export function FreeFlowBoard({
 
   return (
     <GestureDetector gesture={pan}>
-      <View style={{ width: boardPx, height: boardPx }}>
-        <Canvas style={{ width: boardPx, height: boardPx }}>
+      <View style={responsiveStyles.board}>
+        <Canvas style={responsiveStyles.board}>
           {/* Grid cells */}
           {Array.from({ length: size * size }, (_, i) => (
             <RoundedRect

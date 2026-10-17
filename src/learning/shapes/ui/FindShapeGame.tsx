@@ -18,6 +18,29 @@ const SHAPE_COLORS = [colors.pink, colors.teal, colors.orange];
 
 export function FindShapeGame() {
   const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
+    card: {
+      marginTop: s(spacing.xl),
+      gap: s(spacing.sm),
+      padding: s(spacing.xl),
+      borderWidth: s(1),
+      borderRadius: s(radius.lg),
+    },
+    shape: { width: Math.max(120, s(170)), height: Math.max(120, s(170)) },
+    question: {
+      fontSize: s(typography.body.fontSize),
+      minHeight: s(22),
+    },
+    speaker: {
+      width: Math.max(56, s(56)),
+      height: Math.max(56, s(56)),
+      marginTop: s(spacing.sm),
+      borderRadius: s(radius.pill),
+    },
+    speakerText: { fontSize: s(26) },
+    choices: { gap: s(spacing.md), marginTop: s(spacing.xl) },
+  });
   const [rounds, setRounds] = useState(() => makeShapeRounds(ROUNDS, OPTIONS));
   const [index, setIndex] = useState(0);
   const [wrong, setWrong] = useState<number[]>([]);
@@ -29,7 +52,6 @@ export function FindShapeGame() {
   const { target } = round;
   const ratio = firstTry / ROUNDS;
   const stars = starsFromRatio(ratio);
-  const speakerSize = Math.max(48, s(56));
 
   const ask = () => speak("What shape is this?");
 
@@ -86,7 +108,7 @@ export function FindShapeGame() {
 
   return (
     <GameScreen title="🔶 Name the Shape" subtitle="Look and tap">
-      <View style={styles.row}>
+      <View style={[styles.row, responsiveStyles.row]}>
         <StatChip
           label="ROUND"
           value={`${index + 1}/${ROUNDS}`}
@@ -95,25 +117,27 @@ export function FindShapeGame() {
         <StatChip label="FIRST TRY" value={firstTry} color={colors.yellow} />
       </View>
 
-      <View style={styles.card}>
+      <View style={[styles.card, responsiveStyles.card]}>
         <ShapeView
           id={target.id}
-          size={170}
+          size={responsiveStyles.shape.width}
           color={SHAPE_COLORS[index % SHAPE_COLORS.length]}
         />
-        <Text style={styles.question}>
+        <Text style={[styles.question, responsiveStyles.question]}>
           {solved ? "Great job! 🎉" : "What shape is this?"}
         </Text>
         <PressableScale
-          style={[styles.speaker, { width: speakerSize, height: speakerSize }]}
+          style={[styles.speaker, responsiveStyles.speaker]}
           haptic={false}
           onPress={ask}
         >
-          <Text style={styles.speakerText}>🔊</Text>
+          <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+            🔊
+          </Text>
         </PressableScale>
       </View>
 
-      <View style={styles.choices}>
+      <View style={[styles.choices, responsiveStyles.choices]}>
         {round.options.map((name, i) => (
           <ChoiceTile
             key={`${index}-${i}`}
@@ -147,25 +171,18 @@ export function FindShapeGame() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.lg },
+  row: { flexDirection: "row" },
   card: {
-    marginTop: spacing.xl,
     alignItems: "center",
-    gap: spacing.sm,
-    paddingVertical: spacing.xl,
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 1,
-    borderRadius: radius.lg,
   },
-  question: { ...typography.body, color: colors.teal, minHeight: 22 },
+  question: { ...typography.body, color: colors.teal },
   speaker: {
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.purple,
-    borderRadius: radius.pill,
-    marginTop: spacing.sm,
   },
-  speakerText: { fontSize: 26 },
-  choices: { flexDirection: "row", gap: spacing.md, marginTop: spacing.xl },
+  speakerText: {},
+  choices: { flexDirection: "row" },
 });

@@ -22,8 +22,11 @@ export function StatChip({ label, value, color = colors.text }: Props) {
     chip: {
       paddingVertical: s(spacing.md),
       borderRadius: s(radius.md),
+      borderWidth: s(1),
     },
     label: { marginTop: s(spacing.xs) },
+    valueText: { fontSize: s(typography.heading.fontSize) },
+    labelText: { fontSize: s(typography.caption.fontSize) },
   });
   const scale = useSharedValue(1);
   const isFirstRender = useRef(true);
@@ -52,7 +55,12 @@ export function StatChip({ label, value, color = colors.text }: Props) {
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.75}
-        style={[styles.value, { color }, animatedStyle]}
+        style={[
+          styles.value,
+          responsiveStyles.valueText,
+          { color },
+          animatedStyle,
+        ]}
       >
         {value}
       </Animated.Text>
@@ -60,7 +68,11 @@ export function StatChip({ label, value, color = colors.text }: Props) {
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.75}
-        style={[styles.label, responsiveStyles.label]}
+        style={[
+          styles.label,
+          responsiveStyles.label,
+          responsiveStyles.labelText,
+        ]}
       >
         {label}
       </Text>
@@ -74,7 +86,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 1,
   },
   value: { ...typography.heading },
   label: {

@@ -19,6 +19,7 @@ export function LifelineButton({ emoji, label, count, onPress }: Props) {
       borderRadius: s(radius.lg),
     },
     emoji: { fontSize: s(24) },
+    label: { fontSize: s(typography.caption.fontSize) },
   });
   const empty = count <= 0;
   return (
@@ -28,7 +29,11 @@ export function LifelineButton({ emoji, label, count, onPress }: Props) {
       style={[styles.button, responsiveStyles.button, empty && styles.empty]}
     >
       <Text style={[styles.emoji, responsiveStyles.emoji]}>{emoji}</Text>
-      <Text style={styles.label}>
+      <Text
+        style={[styles.label, responsiveStyles.label]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
         {label} ×{count}
       </Text>
     </PressableScale>
