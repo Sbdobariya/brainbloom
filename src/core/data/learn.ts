@@ -34,4 +34,12 @@ export const learnModules: LearnModule[] = [
     gradient: gradients.primary,
     ready: false,
   },
+  {
+    id: "findLetter",
+    title: "Find the Letter",
+    emoji: "🔎",
+    route: "/learn/find-letter",
+    gradient: gradients.gold,
+    ready: true,
+  },
 ];

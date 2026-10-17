@@ -34,6 +34,7 @@ export default function Home() {
                 title={module.title}
                 emoji={module.emoji}
                 gradient={module.gradient}
+                stars={stars[module.id] ?? 0}
                 locked={!module.ready}
                 index={i}
                 onPress={() =>
