@@ -9,9 +9,10 @@ import { PressableScale } from "@/core/components/PressableScale";
 import { starsForTicTacToe, type Stars } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import {
   applyMove,
   createBoard,
@@ -23,12 +24,20 @@ import {
 } from "../logic/ticTacToe";
 import { Cell } from "./Cell";
 
-const GAP = 10;
-
 export function TicTacToeGame() {
-  const { width } = useWindowDimensions();
-  const boardSize = Math.min(width - spacing.lg * 2, 380);
-  const cellSize = (boardSize - GAP * 2) / 3;
+  const { width, padding, s } = useResponsive();
+  const gap = s(10);
+  const maxBoard = Math.min(width - padding * 2, s(380));
+  const cellSize = Math.floor((maxBoard - gap * 2) / 3);
+  const boardSize = cellSize * 3 + gap * 2;
+  const responsiveStyles = StyleSheet.create({
+    row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
+    status: { marginTop: s(spacing.xl) },
+    chip: { minHeight: Math.max(56, s(48)), borderRadius: s(radius.pill) },
+    board: { width: boardSize, gap, marginTop: s(spacing.xl) },
+    boardRow: { flexDirection: "row", gap },
+    footer: { paddingBottom: s(spacing.xl) },
+  });
 
   const [board, setBoard] = useState(createBoard());
   const [turn, setTurn] = useState<Player>("X"); // human = X, CPU = O
@@ -122,7 +131,7 @@ export function TicTacToeGame() {
 
   return (
     <GameScreen title="Tic Tac Toe" subtitle={`vs Computer · ${difficulty}`}>
-      <View style={styles.row}>
+      <View style={[styles.row, responsiveStyles.row]}>
         <StatChip label="YOU" value={scores.you} color={colors.pink} />
         <StatChip label="DRAWS" value={scores.draws} color={colors.textMuted} />
         <StatChip label="CPU" value={scores.cpu} color={colors.teal} />
@@ -130,12 +139,16 @@ export function TicTacToeGame() {
 
       <Text style={styles.status}>{status}</Text>
 
-      <View style={styles.row}>
+      <View style={[styles.row, responsiveStyles.row]}>
         {(["easy", "hard"] as const).map((d) => (
           <PressableScale
             key={d}
             onPress={() => changeDifficulty(d)}
-            style={[styles.chip, difficulty === d && styles.chipActive]}
+            style={[
+              styles.chip,
+              responsiveStyles.chip,
+              difficulty === d && styles.chipActive,
+            ]}
           >
             <Text style={styles.chipText}>
               {d === "easy" ? "🙂 Easy" : "💀 Hard"}
@@ -144,20 +157,28 @@ export function TicTacToeGame() {
         ))}
       </View>
 
-      <View style={[styles.board, { width: boardSize }]}>
-        {board.map((mark, i) => (
-          <Cell
-            key={i}
-            mark={mark}
-            size={cellSize}
-            highlighted={winLine.includes(i)}
-            disabled={over || turn !== "X" || !!mark}
-            onPress={() => onCellPress(i)}
-          />
+      <View style={[styles.board, responsiveStyles.board]}>
+        {[0, 1, 2].map((r) => (
+          <View key={r} style={responsiveStyles.boardRow}>
+            {[0, 1, 2].map((c) => {
+              const i = r * 3 + c;
+              const mark = board[i];
+              return (
+                <Cell
+                  key={i}
+                  mark={mark}
+                  size={cellSize}
+                  highlighted={winLine.includes(i)}
+                  disabled={over || turn !== "X" || !!mark}
+                  onPress={() => onCellPress(i)}
+                />
+              );
+            })}
+          </View>
         ))}
       </View>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, responsiveStyles.footer]}>
         <GradientButton label="New Game" onPress={newRound} />
       </View>
       {showResult && (
@@ -187,31 +208,24 @@ export function TicTacToeGame() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.lg },
+  row: { flexDirection: "row" },
   status: {
     ...typography.heading,
     color: colors.text,
     textAlign: "center",
-    marginTop: spacing.xl,
   },
   chip: {
     flex: 1,
-    minHeight: 48,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.pill,
   },
   chipActive: { borderColor: colors.yellow },
   chipText: { ...typography.body, color: colors.text },
   board: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: GAP,
     alignSelf: "center",
-    marginTop: spacing.xl,
   },
-  footer: { flex: 1, justifyContent: "flex-end", paddingBottom: spacing.xl },
+  footer: { flex: 1, justifyContent: "flex-end" },
 });

@@ -1,4 +1,5 @@
 import { colors } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import {
   Canvas,
   Circle,
@@ -31,6 +32,9 @@ export function FreeFlowBoard({
   onEnd,
 }: Props) {
   const { size, pairs } = level;
+  const { s } = useResponsive();
+  const gridInset = s(2);
+  const gridRadius = s(10);
   const cell = boardPx / size;
 
   // The gesture is created once. It calls the latest handlers through a ref,
@@ -88,11 +92,11 @@ export function FreeFlowBoard({
           {Array.from({ length: size * size }, (_, i) => (
             <RoundedRect
               key={i}
-              x={(i % size) * cell + 2}
-              y={Math.floor(i / size) * cell + 2}
-              width={cell - 4}
-              height={cell - 4}
-              r={10}
+              x={(i % size) * cell + gridInset}
+              y={Math.floor(i / size) * cell + gridInset}
+              width={cell - gridInset * 2}
+              height={cell - gridInset * 2}
+              r={gridRadius}
               color={colors.bgSoft}
             />
           ))}

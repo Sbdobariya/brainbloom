@@ -1,5 +1,6 @@
 import { PressableScale } from "@/core/components/PressableScale";
-import { colors, radius, spacing } from "@/core/theme";
+import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect } from "react";
 import { StyleSheet, Text } from "react-native";
 import Animated, {
@@ -22,6 +23,9 @@ type SlotProps = {
 };
 
 function Slot({ letter, index, status, onPress }: SlotProps) {
+  const { s } = useResponsive();
+  const slotWidth = Math.max(48, s(60));
+  const slotHeight = Math.max(56, s(68));
   const pop = useSharedValue(1);
   const bounce = useSharedValue(0);
 
@@ -63,8 +67,20 @@ function Slot({ letter, index, status, onPress }: SlotProps) {
       disabled={!letter || status !== "playing"}
       haptic={false}
     >
-      <Animated.View style={[styles.slot, { borderColor }, style]}>
-        <Text style={[styles.letter, status === "timeout" && styles.reveal]}>
+      <Animated.View
+        style={[
+          styles.slot,
+          { borderColor, width: slotWidth, height: slotHeight },
+          style,
+        ]}
+      >
+        <Text
+          style={[
+            styles.letter,
+            { fontSize: Math.max(22, s(32)) },
+            status === "timeout" && styles.reveal,
+          ]}
+        >
           {letter ?? ""}
         </Text>
       </Animated.View>
@@ -79,6 +95,7 @@ type Props = {
 };
 
 export function AnswerSlots({ letters, status, onRemove }: Props) {
+  const { s } = useResponsive();
   const shake = useSharedValue(0);
 
   // Wrong answer: quick left-right shake. Gentle, no harsh red.
@@ -114,14 +131,12 @@ export function AnswerSlots({ letters, status, onRemove }: Props) {
 const styles = StyleSheet.create({
   row: { flexDirection: "row", justifyContent: "center", gap: spacing.sm },
   slot: {
-    width: 60,
-    height: 68,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.bgSoft,
     borderWidth: 2,
     borderRadius: radius.md,
   },
-  letter: { fontSize: 32, fontWeight: "800", color: colors.text },
+  letter: { ...typography.heading, color: colors.text },
   reveal: { color: colors.teal },
 });

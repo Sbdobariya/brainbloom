@@ -2,6 +2,7 @@ import { playSound, speak } from "@/core/audio/feedback";
 import { GameScreen } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -13,18 +14,18 @@ import Animated, {
 } from "react-native-reanimated";
 import { colorItems, type ColorItem } from "../data/colors";
 
-const COLOR_SIZE = 190;
-
 const sayIt = (item: ColorItem) =>
   speak(`${item.name}. ${item.name}, like a ${item.thing}`);
 
 type CardProps = { item: ColorItem; dir: 1 | -1 };
 
 function ColorCard({ item, dir }: CardProps) {
+  const { s } = useResponsive();
   const x = useSharedValue(dir * 90);
   const opacity = useSharedValue(0);
   const wobble = useSharedValue(0);
   const scale = useSharedValue(1);
+  const circleSize = Math.max(120, s(190));
 
   useEffect(() => {
     x.value = withSpring(0, { damping: 16, stiffness: 180 });
@@ -58,7 +59,17 @@ function ColorCard({ item, dir }: CardProps) {
     <Animated.View style={[styles.card, { borderColor: item.hex }, cardStyle]}>
       <PressableScale onPress={onTapColor} haptic={false} scaleTo={0.92}>
         <Animated.View style={circleStyle}>
-          <View style={[styles.circle, { backgroundColor: item.hex }]}>
+          <View
+            style={[
+              styles.circle,
+              {
+                backgroundColor: item.hex,
+                width: circleSize,
+                height: circleSize,
+                borderRadius: circleSize / 2,
+              },
+            ]}
+          >
             <Text style={styles.emoji}>{item.emoji}</Text>
           </View>
         </Animated.View>
@@ -146,9 +157,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
   },
   circle: {
-    width: COLOR_SIZE,
-    height: COLOR_SIZE,
-    borderRadius: COLOR_SIZE / 2,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -580,10 +580,20 @@
   dependencies:
     "@types/hammerjs" "^2.0.36"
 
+"@expo-google-fonts/fredoka@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/fredoka/-/fredoka-0.4.1.tgz#3e3875a28421ddf51aaaa99021916cc06bab33a8"
+  integrity sha512-px3uHDidG1RI7mMAjfKQktK9yZoVn/Uvqgp1G/Zkd6ZN9flXFxhUoPDRZdcCj2knFvkKmlvOx96SD3j4fxq7ig==
+
 "@expo-google-fonts/material-symbols@^0.4.1":
   version "0.4.49"
   resolved "https://registry.yarnpkg.com/@expo-google-fonts/material-symbols/-/material-symbols-0.4.49.tgz#29bed0101d23e4f63b50994092fb892ff862e7de"
   integrity sha512-HtoaXYCk7A9kOjwoxrjq6i0iDtAoQnOPm31zUn+TgmKlHVUU+yyqvQDxN830MvGmBQV8eINv/SK7JRtWhB2xcg==
+
+"@expo-google-fonts/nunito@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/nunito/-/nunito-0.4.2.tgz#9ce15e924dc7fc29a2257afb7f78a3f0e7d0d39f"
+  integrity sha512-1KCWphw/I2ugqfs9iRHUCkPTnomNgGPtF4AvqVquoEKxr0EL+mcLNLgeixsslbaSFevRR6/KJAE3sc8g0VaY0Q==
 
 "@expo/cli@^57.0.28":
   version "57.0.28"
@@ -748,7 +758,7 @@
     resolve-from "^5.0.0"
     semver "^7.6.0"
 
-"@expo/image-utils@^0.11.5", "@expo/image-utils@^0.11.6":
+"@expo/image-utils@^0.11.6":
   version "0.11.6"
   resolved "https://registry.yarnpkg.com/@expo/image-utils/-/image-utils-0.11.6.tgz#3cc751d9e90cc7510351928e9c2fc02709c0b1dc"
   integrity sha512-rmMpn7QGp6pUGRCQ3vvB9RP/vqq2q/PpToRh4dL/FbhSZOLZ1YTotpuLHf71FGOEfgKil/4PCd3hkWe/CCeiEg==
@@ -2209,13 +2219,13 @@ expo-speech@~57.0.3:
   resolved "https://registry.yarnpkg.com/expo-speech/-/expo-speech-57.0.3.tgz#ea227cb4073042dc5ce474c6ca9fb23c02f899e3"
   integrity sha512-rcO8izKziksrV4X3qQ5g+prFNTZmLYDEGEVnTvuvpOZDwjzP9nsdoaFymhY+qj9AJfMcpvR7Wshm+zpislyJBg==
 
-expo-splash-screen@~57.0.9:
-  version "57.0.9"
-  resolved "https://registry.yarnpkg.com/expo-splash-screen/-/expo-splash-screen-57.0.9.tgz#916e23cdfcb1538ba88e091692dedcb36b13b08d"
-  integrity sha512-7cKDn7uBwg0RkcmY015/5j9st4msWJ4zQiPmQdVZoppW3cFSbv05n7xhM6CjUU466Tx4VRTqDF21HuIHkmnEtA==
+expo-splash-screen@~57.0.10:
+  version "57.0.10"
+  resolved "https://registry.yarnpkg.com/expo-splash-screen/-/expo-splash-screen-57.0.10.tgz#be812f710ad61949f16ac3bd293ec4f86bc282bb"
+  integrity sha512-W7++tMiyVMviWPTvaTXKpcOwwu5SbriwA2n0ewEhC+ic1LFaUNTUXiIXr95MVMSHaLRgtIG9dGyCTCb+NkekkA==
   dependencies:
-    "@expo/config-plugins" "~57.0.9"
-    "@expo/image-utils" "^0.11.5"
+    "@expo/config-plugins" "~57.0.10"
+    "@expo/image-utils" "^0.11.6"
     xml2js "0.6.0"
 
 expo-status-bar@~57.0.1:

@@ -1,5 +1,6 @@
 import { PressableScale } from "@/core/components/PressableScale";
-import { colors, radius } from "@/core/theme";
+import { colors, radius, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect } from "react";
 import { StyleSheet } from "react-native";
 import Animated, {
@@ -21,6 +22,10 @@ type Props = {
 };
 
 export function Cell({ mark, size, highlighted, disabled, onPress }: Props) {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    cell: { borderWidth: s(2), borderRadius: s(radius.lg) },
+  });
   const markScale = useSharedValue(0);
   const pulse = useSharedValue(1);
 
@@ -63,12 +68,13 @@ export function Cell({ mark, size, highlighted, disabled, onPress }: Props) {
       scaleTo={0.92}
       style={[
         styles.cell,
+        responsiveStyles.cell,
         { width: size, height: size },
         highlighted && { borderColor: color, backgroundColor: colors.bgSoft },
       ]}
     >
       <Animated.Text
-        style={[styles.mark, { color, fontSize: size * 0.6 }, markStyle]}
+        style={[styles.mark, { color, fontSize: size * 0.5 }, markStyle]}
       >
         {mark ?? ""}
       </Animated.Text>
@@ -80,10 +86,8 @@ const styles = StyleSheet.create({
   cell: {
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 2,
-    borderRadius: radius.lg,
     alignItems: "center",
     justifyContent: "center",
   },
-  mark: { fontWeight: "800" },
+  mark: { ...typography.title },
 });

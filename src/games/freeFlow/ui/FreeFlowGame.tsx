@@ -9,9 +9,10 @@ import { PressableScale } from "@/core/components/PressableScale";
 import { starsForMoves } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, gradients, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import {
   applyHint,
   coverage,
@@ -37,8 +38,27 @@ const PALETTE = [
 ];
 
 export function FreeFlowGame() {
-  const { width, height } = useWindowDimensions();
-  const boardPx = Math.min(width - spacing.lg * 2, height * 0.5, 380);
+  const { width, height, padding, s } = useResponsive();
+  const boardPx = Math.min(width - padding * 2, height * 0.5, s(380));
+  const responsiveStyles = StyleSheet.create({
+    row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
+    levelRow: { gap: s(spacing.lg), marginTop: s(spacing.lg) },
+    arrow: {
+      width: Math.max(56, s(48)),
+      height: Math.max(56, s(48)),
+      borderRadius: s(radius.pill),
+    },
+    arrowText: { fontSize: s(16) },
+    levelText: { minWidth: s(100) },
+    boardWrap: {
+      marginTop: s(spacing.lg),
+      padding: s(spacing.sm),
+      borderWidth: s(2),
+      borderRadius: s(radius.lg),
+    },
+    tip: { marginTop: s(spacing.lg) },
+    footer: { paddingBottom: s(spacing.xl) },
+  });
 
   const [levelNo, setLevelNo] = useState(1);
   const [level, setLevel] = useState(() => createLevel(1));
@@ -158,7 +178,7 @@ export function FreeFlowGame() {
       title="🌊 Free Flow"
       subtitle={`Level ${levelNo} · ${level.size}×${level.size}`}
     >
-      <View style={styles.row}>
+      <View style={[styles.row, responsiveStyles.row]}>
         <StatChip label="MOVES" value={moves} color={colors.yellow} />
         <StatChip
           label="PAIRS"
@@ -168,24 +188,26 @@ export function FreeFlowGame() {
         <StatChip label="COVERED" value={`${covered}%`} color={colors.teal} />
       </View>
 
-      <View style={styles.levelRow}>
+      <View style={[styles.levelRow, responsiveStyles.levelRow]}>
         <PressableScale
-          style={styles.arrow}
+          style={[styles.arrow, responsiveStyles.arrow]}
           disabled={levelNo <= 1}
           onPress={() => loadLevel(levelNo - 1)}
         >
-          <Text style={styles.arrowText}>◀</Text>
+          <Text style={[styles.arrowText, responsiveStyles.arrowText]}>◀</Text>
         </PressableScale>
-        <Text style={styles.levelText}>Level {levelNo}</Text>
+        <Text style={[styles.levelText, responsiveStyles.levelText]}>
+          Level {levelNo}
+        </Text>
         <PressableScale
-          style={styles.arrow}
+          style={[styles.arrow, responsiveStyles.arrow]}
           onPress={() => loadLevel(levelNo + 1)}
         >
-          <Text style={styles.arrowText}>▶</Text>
+          <Text style={[styles.arrowText, responsiveStyles.arrowText]}>▶</Text>
         </PressableScale>
       </View>
 
-      <View style={styles.boardWrap}>
+      <View style={[styles.boardWrap, responsiveStyles.boardWrap]}>
         <FreeFlowBoard
           level={level}
           paths={paths}
@@ -197,14 +219,14 @@ export function FreeFlowGame() {
         />
       </View>
 
-      <Text style={styles.tip}>
+      <Text style={[styles.tip, responsiveStyles.tip]}>
         {allConnected && !solved
           ? "Almost! Cover every square 🌟"
           : "Connect matching colors and fill the whole board"}
       </Text>
 
-      <View style={styles.footer}>
-        <View style={styles.row}>
+      <View style={[styles.footer, responsiveStyles.footer]}>
+        <View style={[styles.row, responsiveStyles.row]}>
           <View style={styles.flex}>
             <GradientButton
               label="↩️ Undo"
@@ -244,44 +266,33 @@ export function FreeFlowGame() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.lg },
+  row: { flexDirection: "row" },
   flex: { flex: 1 },
   levelRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: spacing.lg,
-    marginTop: spacing.lg,
   },
   arrow: {
-    width: 48,
-    height: 48,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.card,
-    borderRadius: radius.pill,
   },
-  arrowText: { color: colors.text, fontSize: 16 },
+  arrowText: { color: colors.text },
   levelText: {
     ...typography.heading,
     color: colors.text,
-    minWidth: 100,
     textAlign: "center",
   },
   boardWrap: {
     alignSelf: "center",
-    marginTop: spacing.lg,
-    padding: spacing.sm,
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 2,
-    borderRadius: radius.lg,
   },
   tip: {
     ...typography.caption,
     color: colors.textMuted,
     textAlign: "center",
-    marginTop: spacing.lg,
   },
-  footer: { flex: 1, justifyContent: "flex-end", paddingBottom: spacing.xl },
+  footer: { flex: 1, justifyContent: "flex-end" },
 });

@@ -10,6 +10,7 @@ import { TimerBar } from "@/core/components/TimerBar";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, gradients, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { router } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -28,6 +29,7 @@ const ROUNDS = 5;
 const SECONDS_PER_ROUND = 30;
 
 export function WordBuilderGame() {
+  const { s } = useResponsive();
   const [round, setRound] = useState(() => pickRound(ROUNDS));
   const [roundIndex, setRoundIndex] = useState(0);
   const [placed, setPlaced] = useState<Tile[]>([]);
@@ -149,6 +151,9 @@ export function WordBuilderGame() {
           ? "Here is the word!"
           : `Build the word (${entry.word.length} letters)`;
 
+  const timerWidth = Math.max(28, s(36));
+  const emojiSize = Math.max(46, s(64));
+
   return (
     <GameScreen
       title="Word Builder"
@@ -178,14 +183,18 @@ export function WordBuilderGame() {
       <View style={styles.timer}>
         {/* key remounts the bar each round so it snaps back to full */}
         <TimerBar key={roundIndex} progress={secondsLeft / SECONDS_PER_ROUND} />
-        <Text style={styles.seconds}>{Math.max(secondsLeft, 0)}s</Text>
+        <Text style={[styles.seconds, { width: timerWidth }]}>
+          {Math.max(secondsLeft, 0)}s
+        </Text>
       </View>
 
       <View style={styles.card}>
         <Text style={styles.category}>
           {info.emoji} {info.title.toUpperCase()}
         </Text>
-        <Text style={styles.emoji}>{entry.emoji}</Text>
+        <Text style={[styles.emoji, { fontSize: emojiSize }]}>
+          {entry.emoji}
+        </Text>
         <Text style={styles.message}>{message}</Text>
         <AnswerSlots
           letters={slotLetters}
@@ -239,7 +248,6 @@ const styles = StyleSheet.create({
   seconds: {
     ...typography.caption,
     color: colors.textMuted,
-    width: 36,
     textAlign: "right",
   },
   card: {

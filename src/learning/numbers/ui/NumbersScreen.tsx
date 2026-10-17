@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderRadius: radius.lg,
   },
-  numeral: { fontSize: 110, fontWeight: "800", lineHeight: 120 },
+  numeral: { ...typography.title, fontSize: 110, lineHeight: 120 },
   word: { ...typography.title, color: colors.text },
   items: {
     flexDirection: "row",

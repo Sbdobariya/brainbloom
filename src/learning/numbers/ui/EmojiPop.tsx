@@ -1,3 +1,4 @@
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect } from "react";
 import { StyleSheet } from "react-native";
 import Animated, {
@@ -10,22 +11,37 @@ import Animated, {
 type Props = { emoji: string; index: number };
 
 export function EmojiPop({ emoji, index }: Props) {
-  const s = useSharedValue(0);
+  const { s: scaleSize } = useResponsive();
+  const pop = useSharedValue(0);
+  const cellSize = Math.max(56, scaleSize(64));
 
   useEffect(() => {
     // Each picture pops in a moment after the one before it
-    s.value = withDelay(
+    pop.value = withDelay(
       index * 90,
       withSpring(1, { damping: 7, stiffness: 180 }),
     );
-  }, [index, s]);
+  }, [index, pop]);
 
   const style = useAnimatedStyle(() => ({
-    opacity: s.value,
-    transform: [{ scale: s.value }, { rotate: `${(1 - s.value) * -25}deg` }],
+    opacity: pop.value,
+    transform: [
+      { scale: pop.value },
+      { rotate: `${(1 - pop.value) * -25}deg` },
+    ],
   }));
 
-  return <Animated.Text style={[styles.emoji, style]}>{emoji}</Animated.Text>;
+  return (
+    <Animated.Text
+      style={[
+        styles.emoji,
+        { width: cellSize, height: cellSize, lineHeight: cellSize },
+        style,
+      ]}
+    >
+      {emoji}
+    </Animated.Text>
+  );
 }
 
 const styles = StyleSheet.create({

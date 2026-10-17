@@ -1,7 +1,14 @@
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
-import { StyleSheet, Text, View, type ViewStyle } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  type TextStyle,
+  type ViewStyle,
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -28,9 +35,28 @@ export function GameCard({
   stars,
   locked,
   index,
-  width = "48%",
+  width,
   onPress,
 }: Props) {
+  const { cardWidth, s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    wrapper: {
+      width: (width ?? cardWidth) as ViewStyle["width"],
+      marginBottom: s(spacing.lg),
+    } as ViewStyle,
+    card: {
+      minHeight: s(150),
+      borderRadius: s(radius.lg),
+      padding: s(spacing.lg),
+    } as ViewStyle,
+    emoji: { fontSize: s(44) } as TextStyle,
+    badge: {
+      top: s(spacing.md),
+      right: s(spacing.md),
+      paddingHorizontal: s(spacing.sm),
+      paddingVertical: s(spacing.xs),
+    } as ViewStyle,
+  });
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -50,23 +76,28 @@ export function GameCard({
   }));
 
   return (
-    <Animated.View
-      style={[styles.wrapper, { width: width as ViewStyle["width"] }, entrance]}
-    >
+    <Animated.View style={[responsiveStyles.wrapper, entrance]}>
       <PressableScale onPress={onPress} style={styles.pressable}>
         <LinearGradient
           colors={gradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={[styles.card, locked && styles.locked]}
+          style={[styles.card, responsiveStyles.card, locked && styles.locked]}
         >
-          <Text style={styles.emoji}>{emoji}</Text>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={responsiveStyles.emoji}>{emoji}</Text>
+          <Text
+            style={styles.title}
+            numberOfLines={2}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+          >
+            {title}
+          </Text>
           {stars !== undefined && stars > 0 && (
             <Text style={styles.stars}>{stars}/3 ⭐</Text>
           )}
           {locked && (
-            <View style={styles.badge}>
+            <View style={[styles.badge, responsiveStyles.badge]}>
               <Text style={styles.badgeText}>Soon</Text>
             </View>
           )}
@@ -77,25 +108,16 @@ export function GameCard({
 }
 
 const styles = StyleSheet.create({
-  wrapper: { marginBottom: spacing.lg },
   pressable: { width: "100%" },
   card: {
-    height: 150,
-    borderRadius: radius.lg,
-    padding: spacing.lg,
     justifyContent: "space-between",
   },
   locked: { opacity: 0.6 },
-  emoji: { fontSize: 44 },
   title: { ...typography.heading, color: colors.text },
   stars: { ...typography.caption, color: colors.text },
   badge: {
     position: "absolute",
-    top: spacing.md,
-    right: spacing.md,
     backgroundColor: "rgba(0,0,0,0.35)",
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
     borderRadius: radius.pill,
   },
   badgeText: { ...typography.caption, color: colors.text },

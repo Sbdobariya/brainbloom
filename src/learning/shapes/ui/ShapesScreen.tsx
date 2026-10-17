@@ -2,6 +2,7 @@ import { playSound, speak } from "@/core/audio/feedback";
 import { GameScreen } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -24,18 +25,18 @@ const SHAPE_COLORS = [
   colors.teal,
   colors.red,
 ];
-const SHAPE_SIZE = 190;
-
 const sayIt = (item: ShapeItem) => speak(`${item.name}. ${item.fact}`);
 
 type CardProps = { item: ShapeItem; color: string; dir: 1 | -1 };
 
 // Re-created (via key) for every shape: slides in and speaks on mount
 function ShapeCard({ item, color, dir }: CardProps) {
+  const { s } = useResponsive();
   const x = useSharedValue(dir * 90);
   const opacity = useSharedValue(0);
   const wobble = useSharedValue(0);
   const scale = useSharedValue(1);
+  const shapeSize = Math.max(120, s(190));
 
   useEffect(() => {
     x.value = withSpring(0, { damping: 16, stiffness: 180 });
@@ -70,7 +71,7 @@ function ShapeCard({ item, color, dir }: CardProps) {
     <Animated.View style={[styles.card, { borderColor: color }, cardStyle]}>
       <PressableScale onPress={onTapShape} haptic={false} scaleTo={0.92}>
         <Animated.View style={shapeStyle}>
-          <ShapeView id={item.id} size={SHAPE_SIZE} color={color} />
+          <ShapeView id={item.id} size={shapeSize} color={color} />
         </Animated.View>
       </PressableScale>
       <Text style={[styles.name, { color }]}>{item.name}</Text>

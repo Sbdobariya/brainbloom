@@ -5,6 +5,7 @@ import { PressableScale } from "@/core/components/PressableScale";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -16,6 +17,7 @@ const OPTIONS = 3;
 const SHAPE_COLORS = [colors.pink, colors.teal, colors.orange];
 
 export function FindShapeGame() {
+  const { s } = useResponsive();
   const [rounds, setRounds] = useState(() => makeShapeRounds(ROUNDS, OPTIONS));
   const [index, setIndex] = useState(0);
   const [wrong, setWrong] = useState<number[]>([]);
@@ -27,6 +29,7 @@ export function FindShapeGame() {
   const { target } = round;
   const ratio = firstTry / ROUNDS;
   const stars = starsFromRatio(ratio);
+  const speakerSize = Math.max(48, s(56));
 
   const ask = () => speak("What shape is this?");
 
@@ -101,7 +104,11 @@ export function FindShapeGame() {
         <Text style={styles.question}>
           {solved ? "Great job! 🎉" : "What shape is this?"}
         </Text>
-        <PressableScale style={styles.speaker} haptic={false} onPress={ask}>
+        <PressableScale
+          style={[styles.speaker, { width: speakerSize, height: speakerSize }]}
+          haptic={false}
+          onPress={ask}
+        >
           <Text style={styles.speakerText}>🔊</Text>
         </PressableScale>
       </View>
@@ -153,8 +160,6 @@ const styles = StyleSheet.create({
   },
   question: { ...typography.body, color: colors.teal, minHeight: 22 },
   speaker: {
-    width: 56,
-    height: 56,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.purple,

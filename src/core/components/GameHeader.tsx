@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { colors, radius, spacing, typography } from "@/core/theme";
+import { colors, MIN_TOUCH, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { PressableScale } from "./PressableScale";
 
 type Props = {
@@ -12,19 +13,46 @@ type Props = {
 };
 
 export function GameHeader({ title, subtitle, onBack, right }: Props) {
+  const { s } = useResponsive();
+  const buttonSize = Math.max(MIN_TOUCH, s(48));
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingHorizontal: s(spacing.lg),
+          paddingVertical: s(spacing.md),
+          gap: s(spacing.sm),
+        },
+      ]}
+    >
       {onBack ? (
-        <PressableScale onPress={onBack} style={styles.slot}>
-          <View style={styles.backButton}>
+        <PressableScale
+          onPress={onBack}
+          style={[styles.slot, { width: buttonSize, height: buttonSize }]}
+        >
+          <View
+            style={[
+              styles.backButton,
+              { width: buttonSize, height: buttonSize },
+            ]}
+          >
             <Text style={styles.backLabel}>{"<"}</Text>
           </View>
         </PressableScale>
       ) : (
-        <View style={styles.slot} />
+        <View
+          style={[styles.slot, { width: buttonSize, height: buttonSize }]}
+        />
       )}
       <View style={styles.titleContainer}>
-        <Text numberOfLines={1} style={styles.title}>
+        <Text
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+          style={styles.title}
+        >
           {title}
         </Text>
         {subtitle ? (
@@ -33,7 +61,9 @@ export function GameHeader({ title, subtitle, onBack, right }: Props) {
           </Text>
         ) : null}
       </View>
-      <View style={styles.slot}>{right}</View>
+      <View style={[styles.slot, { width: buttonSize, height: buttonSize }]}>
+        {right}
+      </View>
     </View>
   );
 }
@@ -42,19 +72,12 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    gap: spacing.sm,
   },
   slot: {
-    width: 48,
-    height: 48,
     alignItems: "center",
     justifyContent: "center",
   },
   backButton: {
-    width: 48,
-    height: 48,
     borderRadius: radius.pill,
     backgroundColor: colors.card,
     alignItems: "center",

@@ -20,7 +20,9 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.brainbloom",
-      "blockedPermissions": ["android.permission.RECORD_AUDIO"]
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "output": "static",
@@ -49,7 +51,8 @@
             "enableSceneSupport": true
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,

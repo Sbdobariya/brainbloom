@@ -9,6 +9,7 @@ import { PressableScale } from "@/core/components/PressableScale";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -22,6 +23,7 @@ const CHOICE_COLORS = [colors.pink, colors.teal, colors.orange];
 const CAPITAL = (w: string) => w[0].toUpperCase() + w.slice(1);
 
 export function HowManyGame() {
+  const { s } = useResponsive();
   const [rounds, setRounds] = useState(() => makeCountRounds(ROUNDS, OPTIONS));
   const [index, setIndex] = useState(0);
   const [wrong, setWrong] = useState<number[]>([]);
@@ -32,6 +34,7 @@ export function HowManyGame() {
   const round = rounds[index];
   const { item, n } = round;
   const stars = starsFromRatio(firstTry / ROUNDS);
+  const itemWidth = Math.max(56, s(68));
 
   const ask = () => speak(`How many ${item.plural} are there?`);
 
@@ -105,7 +108,7 @@ export function HowManyGame() {
 
       <View style={styles.card}>
         {/* key remounts the group so the pop-in replays every round */}
-        <View key={index} style={styles.items}>
+        <View key={index} style={[styles.items, { width: itemWidth * 5 }]}>
           {Array.from({ length: n }, (_, i) => (
             <EmojiPop key={i} emoji={item.emoji} index={i} />
           ))}
@@ -168,7 +171,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    width: 5 * 68,
     minHeight: 136,
     alignContent: "center",
   },

@@ -1,9 +1,10 @@
 import { router } from "expo-router";
 import type { ReactNode } from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { colors, spacing } from "@/core/theme";
+import { colors } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { GameHeader } from "./GameHeader";
 
 type Props = {
@@ -14,15 +15,33 @@ type Props = {
 };
 
 export function GameScreen({ title, subtitle, right, children }: Props) {
+  const { contentWidth, padding } = useResponsive();
+
   return (
     <SafeAreaView style={styles.container}>
-      <GameHeader
-        title={title}
-        subtitle={subtitle}
-        onBack={() => router.back()}
-        right={right}
-      />
-      <View style={styles.content}>{children}</View>
+      <View style={[styles.header, { maxWidth: contentWidth }]}>
+        <GameHeader
+          title={title}
+          subtitle={subtitle}
+          onBack={() => router.back()}
+          right={right}
+        />
+      </View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View
+          style={[
+            styles.content,
+            {
+              maxWidth: contentWidth,
+              width: "100%",
+              alignSelf: "center",
+              paddingHorizontal: padding,
+            },
+          ]}
+        >
+          {children}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -32,8 +51,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg,
   },
+  header: {
+    width: "100%",
+    alignSelf: "center",
+  },
+  scrollContent: { flexGrow: 1 },
   content: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
+    flexGrow: 1,
   },
 });

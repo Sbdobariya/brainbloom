@@ -3,6 +3,7 @@ import { GameScreen, ResultModal, StatChip, TimerBar } from "@/core/components";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -19,6 +20,27 @@ const LETTERS = ["A", "B", "C", "D"];
 type Status = "playing" | "correct" | "wrong" | "timeout";
 
 export function QuizGame() {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
+    timer: { gap: s(spacing.md), marginTop: s(spacing.lg) },
+    seconds: { width: s(36) },
+    card: {
+      marginTop: s(spacing.lg),
+      padding: s(spacing.xl),
+      minHeight: s(170),
+      gap: s(spacing.md),
+      borderWidth: s(1),
+      borderRadius: s(radius.lg),
+    },
+    tag: {
+      paddingHorizontal: s(spacing.md),
+      paddingVertical: s(spacing.xs),
+      borderRadius: s(radius.pill),
+    },
+    options: { rowGap: s(spacing.md), marginTop: s(spacing.lg) },
+    lifelines: { gap: s(spacing.sm), paddingBottom: s(spacing.xl) },
+  });
   const [questions, setQuestions] = useState(() =>
     pickQuestions(QUESTIONS, LEVEL),
   );
@@ -153,7 +175,7 @@ export function QuizGame() {
 
   return (
     <GameScreen title="🧠 Brain Boost" subtitle="Speed Quiz">
-      <View style={styles.row}>
+      <View style={[styles.row, responsiveStyles.row]}>
         <StatChip label="SCORE" value={score} color={colors.yellow} />
         <StatChip label="STREAK" value={`${streak}x`} color={colors.pink} />
         <StatChip
@@ -168,13 +190,15 @@ export function QuizGame() {
         />
       </View>
 
-      <View style={styles.timer}>
+      <View style={[styles.timer, responsiveStyles.timer]}>
         <TimerBar key={index} progress={Math.min(secondsLeft / SECONDS, 1)} />
-        <Text style={styles.seconds}>{Math.max(secondsLeft, 0)}s</Text>
+        <Text style={[styles.seconds, responsiveStyles.seconds]}>
+          {Math.max(secondsLeft, 0)}s
+        </Text>
       </View>
 
-      <View style={styles.card}>
-        <View style={styles.tag}>
+      <View style={[styles.card, responsiveStyles.card]}>
+        <View style={[styles.tag, responsiveStyles.tag]}>
           <Text style={styles.tagText}>
             {info.emoji} {info.title.toUpperCase()}
           </Text>
@@ -183,7 +207,7 @@ export function QuizGame() {
         <Text style={styles.message}>{message}</Text>
       </View>
 
-      <View style={styles.options}>
+      <View style={[styles.options, responsiveStyles.options]}>
         {q.options.map((o, i) => (
           <OptionButton
             key={`${q.id}-${i}`}
@@ -195,7 +219,7 @@ export function QuizGame() {
         ))}
       </View>
 
-      <View style={styles.lifelines}>
+      <View style={[styles.lifelines, responsiveStyles.lifelines]}>
         <LifelineButton
           emoji="🎲"
           label="50/50"
@@ -231,35 +255,24 @@ export function QuizGame() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.lg },
+  row: { flexDirection: "row" },
   timer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.md,
-    marginTop: spacing.lg,
   },
   seconds: {
     ...typography.caption,
     color: colors.textMuted,
-    width: 36,
     textAlign: "right",
   },
   card: {
-    marginTop: spacing.lg,
-    padding: spacing.xl,
     minHeight: 170,
     justifyContent: "center",
     alignItems: "center",
-    gap: spacing.md,
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 1,
-    borderRadius: radius.lg,
   },
   tag: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.pill,
     backgroundColor: colors.bgSoft,
   },
   tagText: { ...typography.caption, color: colors.yellow, letterSpacing: 1 },
@@ -269,13 +282,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    rowGap: spacing.md,
-    marginTop: spacing.lg,
   },
   lifelines: {
     flexDirection: "row",
-    gap: spacing.sm,
     marginTop: "auto",
-    paddingBottom: spacing.xl,
   },
 });

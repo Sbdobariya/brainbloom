@@ -9,9 +9,10 @@ import { PressableScale } from "@/core/components/PressableScale";
 import { starsForMoves } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, gradients, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import {
   canMove,
   getHint,
@@ -44,17 +45,35 @@ const TILE_GRADIENTS = [
   gradients.cool,
   gradients.gold,
 ] as const;
-const GAP = 8;
-const PAD = 10;
 const SIZES = [3, 4] as const;
 
 const formatTime = (s: number) =>
   `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
 export function SlidingPuzzleGame() {
-  const { width, height } = useWindowDimensions();
-  const boardPx = Math.min(width - spacing.lg * 2, height * 0.45, 380);
-  const inner = boardPx - PAD * 2;
+  const { width, height, padding, s } = useResponsive();
+  const gap = s(8);
+  const pad = s(10);
+  const boardPx = Math.min(width - padding * 2, height * 0.45, s(380));
+  const inner = boardPx - pad * 2;
+  const responsiveStyles = StyleSheet.create({
+    row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
+    chips: { minHeight: Math.max(56, s(48)), borderRadius: s(radius.pill) },
+    board: {
+      marginTop: s(spacing.xl),
+      borderRadius: s(radius.lg),
+      borderWidth: s(2),
+    },
+    boardInner: {
+      position: "absolute",
+      left: pad,
+      top: pad,
+      width: inner,
+      height: inner,
+    },
+    goal: { marginTop: s(spacing.lg) },
+    footer: { paddingBottom: s(spacing.xl) },
+  });
 
   const [size, setSize] = useState<3 | 4>(3);
   const [board, setBoard] = useState(() => shuffleBoard(3));
@@ -67,7 +86,7 @@ export function SlidingPuzzleGame() {
   const resultRecorded = useRef(false);
   const recordResult = useProgress((state) => state.recordResult);
 
-  const tileSize = (inner - GAP * (size - 1)) / size;
+  const tileSize = (inner - gap * (size - 1)) / size;
   const stars = starsForMoves(
     moves,
     size === 3 ? 40 : 100,
@@ -132,7 +151,7 @@ export function SlidingPuzzleGame() {
 
   return (
     <GameScreen title="Puzzle World" subtitle="Sliding Tile Puzzle">
-      <View style={styles.row}>
+      <View style={[styles.row, responsiveStyles.row]}>
         <StatChip label="MOVES" value={moves} color={colors.teal} />
         <StatChip
           label="TIME"
@@ -142,12 +161,16 @@ export function SlidingPuzzleGame() {
         <StatChip label="SIZE" value={`${size}×${size}`} color={colors.pink} />
       </View>
 
-      <View style={styles.row}>
+      <View style={[styles.row, responsiveStyles.row]}>
         {SIZES.map((s) => (
           <PressableScale
             key={s}
             onPress={() => startNew(s)}
-            style={[styles.chip, size === s && styles.chipActive]}
+            style={[
+              styles.chip,
+              responsiveStyles.chips,
+              size === s && styles.chipActive,
+            ]}
           >
             <Text style={styles.chipText}>
               {s === 3 ? "😊" : "⚡"} {s}×{s}
@@ -156,16 +179,14 @@ export function SlidingPuzzleGame() {
         ))}
       </View>
 
-      <View style={[styles.board, { width: boardPx, height: boardPx }]}>
-        <View
-          style={{
-            position: "absolute",
-            left: PAD,
-            top: PAD,
-            width: inner,
-            height: inner,
-          }}
-        >
+      <View
+        style={[
+          styles.board,
+          responsiveStyles.board,
+          { width: boardPx, height: boardPx },
+        ]}
+      >
+        <View style={responsiveStyles.boardInner}>
           {board.map((value, index) =>
             value === 0 ? null : (
               <PuzzleTile
@@ -174,7 +195,7 @@ export function SlidingPuzzleGame() {
                 index={index}
                 size={size}
                 tileSize={tileSize}
-                gap={GAP}
+                gap={gap}
                 emoji={EMOJIS[value - 1]}
                 gradient={TILE_GRADIENTS[value % TILE_GRADIENTS.length]}
                 hinted={hintTile === value}
@@ -185,10 +206,12 @@ export function SlidingPuzzleGame() {
         </View>
       </View>
 
-      <Text style={styles.goal}>Put the tiles in order: 1, 2, 3 …</Text>
+      <Text style={[styles.goal, responsiveStyles.goal]}>
+        Put the tiles in order: 1, 2, 3 …
+      </Text>
 
-      <View style={styles.footer}>
-        <View style={styles.row}>
+      <View style={[styles.footer, responsiveStyles.footer]}>
+        <View style={[styles.row, responsiveStyles.row]}>
           <View style={styles.flex}>
             <GradientButton
               label="💡 Hint"
@@ -217,33 +240,27 @@ export function SlidingPuzzleGame() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.lg },
+  row: { flexDirection: "row" },
   flex: { flex: 1 },
   chip: {
     flex: 1,
-    minHeight: 48,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.pill,
   },
   chipActive: { borderColor: colors.yellow },
   chipText: { ...typography.body, color: colors.text },
   board: {
     alignSelf: "center",
-    marginTop: spacing.xl,
     backgroundColor: colors.bgSoft,
-    borderRadius: radius.lg,
     borderColor: colors.cardBorder,
-    borderWidth: 2,
   },
   goal: {
     ...typography.caption,
     color: colors.textMuted,
     textAlign: "center",
-    marginTop: spacing.lg,
   },
-  footer: { flex: 1, justifyContent: "flex-end", paddingBottom: spacing.xl },
+  footer: { flex: 1, justifyContent: "flex-end" },
 });

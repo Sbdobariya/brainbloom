@@ -1,5 +1,6 @@
 import { PressableScale } from "@/core/components/PressableScale";
-import { colors, radius } from "@/core/theme";
+import { colors, radius, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -30,6 +31,16 @@ export function ChoiceTile({
   fontSize = 56,
   swatch,
 }: Props) {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    tile: {
+      minHeight: s(110),
+      borderWidth: s(3),
+      borderRadius: s(radius.lg),
+    },
+    label: { fontSize: s(fontSize) },
+    swatch: { width: s(64), height: s(64), borderRadius: s(32) },
+  });
   const shake = useSharedValue(0);
   const pop = useSharedValue(1);
   const fade = useSharedValue(1);
@@ -71,6 +82,7 @@ export function ChoiceTile({
         scaleTo={0.92}
         style={[
           styles.tile,
+          responsiveStyles.tile,
           { borderColor: color },
           state === "correct" && { backgroundColor: color },
         ]}
@@ -81,9 +93,12 @@ export function ChoiceTile({
           <Text
             style={[
               styles.letter,
-              { fontSize },
+              responsiveStyles.label,
               { color: state === "correct" ? colors.bg : color },
             ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.55}
           >
             {label}
           </Text>
@@ -96,13 +111,10 @@ export function ChoiceTile({
 const styles = StyleSheet.create({
   wrap: { flex: 1 },
   tile: {
-    height: 110,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.card,
-    borderWidth: 3,
-    borderRadius: radius.lg,
   },
-  letter: { fontSize: 56, fontWeight: "800" },
-  swatch: { width: 64, height: 64, borderRadius: 32 },
+  letter: { ...typography.title, fontSize: 56 },
+  swatch: { alignItems: "center", justifyContent: "center" },
 });

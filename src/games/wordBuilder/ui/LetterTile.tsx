@@ -1,25 +1,32 @@
 import { PressableScale } from "@/core/components/PressableScale";
-import { colors, radius } from "@/core/theme";
+import { colors, radius, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { StyleSheet, Text } from "react-native";
 
 type Props = { letter: string; used: boolean; onPress: () => void };
 
 export function LetterTile({ letter, used, onPress }: Props) {
+  const { s } = useResponsive();
+  const tileSize = Math.max(56, s(64));
+  const fontSize = Math.max(24, s(30));
+
   return (
     <PressableScale
       onPress={onPress}
       disabled={used}
-      style={[styles.tile, used && styles.used]}
+      style={[
+        styles.tile,
+        { width: tileSize, height: tileSize },
+        used && styles.used,
+      ]}
     >
-      <Text style={styles.letter}>{letter}</Text>
+      <Text style={[styles.letter, { fontSize }]}>{letter}</Text>
     </PressableScale>
   );
 }
 
 const styles = StyleSheet.create({
   tile: {
-    width: 64,
-    height: 64,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.card,
@@ -28,5 +35,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
   },
   used: { opacity: 0.25 },
-  letter: { fontSize: 30, fontWeight: "800", color: colors.text },
+  letter: { ...typography.heading, color: colors.text },
 });

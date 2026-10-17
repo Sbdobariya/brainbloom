@@ -4,12 +4,40 @@ import { games } from "@/core/data/games";
 import { learnModules } from "@/core/data/learn";
 import { selectTotalStars, useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { Href, router } from "expo-router";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
-  const cardWidth = 150;
+  const { columns, cardWidth, gap, padding, contentWidth, s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    content: {
+      maxWidth: contentWidth,
+      width: "100%",
+      alignSelf: "center",
+      paddingHorizontal: padding,
+      paddingTop: s(spacing.lg),
+      paddingBottom: s(spacing.lg),
+    },
+    settingsButton: {
+      top: s(spacing.sm),
+      right: padding,
+      width: Math.max(56, s(48)),
+      height: Math.max(56, s(48)),
+    },
+    stats: { gap, marginBottom: s(spacing.xl) },
+    learnHeadingRow: { marginBottom: s(spacing.md) },
+    learnScroll: { marginHorizontal: -padding },
+    learnContent: { gap, paddingLeft: padding, paddingRight: padding },
+    grid: {
+      width: cardWidth * columns + gap * (columns - 1),
+      columnGap: gap,
+    },
+    title: { marginTop: s(spacing.lg) },
+    subtitle: { marginBottom: s(spacing.md) },
+    sectionHeading: { marginBottom: s(spacing.md) },
+  });
   const totalStars = useProgress(selectTotalStars);
   const stars = useProgress((state) => state.stars);
   const streak = useProgress((state) => state.streak);
@@ -17,64 +45,80 @@ export default function Home() {
   return (
     <AnimatedBackground>
       <SafeAreaView style={styles.safe}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.title}>BrainBloom</Text>
-          <Text style={styles.subtitle}>Pick a game and start playing!</Text>
-          <View style={styles.stats}>
-            <StatChip label="TOTAL STARS" value={`⭐ ${totalStars}`} />
-            <StatChip
-              label="DAILY STREAK"
-              value={`🔥 ${streak} ${streak === 1 ? "day" : "days"}`}
-            />
-          </View>
-          <View style={styles.learnHeadingRow}>
-            <Text style={[styles.sectionHeading, styles.learnHeading]}>
-              📚 Learn
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={[styles.content, responsiveStyles.content]}>
+            <Text style={[styles.title, responsiveStyles.title]}>
+              BrainBloom
             </Text>
-            <Text style={styles.learnHint}>Swipe →</Text>
-          </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            decelerationRate="fast"
-            snapToInterval={cardWidth + spacing.md}
-            contentContainerStyle={styles.learnContent}
-            style={styles.learnScroll}
-          >
-            {learnModules.map((module, i) => (
-              <GameCard
-                key={module.id}
-                title={module.title}
-                emoji={module.emoji}
-                gradient={module.gradient}
-                stars={stars[module.id] ?? 0}
-                locked={!module.ready}
-                index={i}
-                width={cardWidth}
-                onPress={() =>
-                  module.ready && router.push(module.route as Href)
-                }
+            <Text style={[styles.subtitle, responsiveStyles.subtitle]}>
+              Pick a game and start playing!
+            </Text>
+            <View style={[styles.stats, responsiveStyles.stats]}>
+              <StatChip label="TOTAL STARS" value={`⭐ ${totalStars}`} />
+              <StatChip
+                label="DAILY STREAK"
+                value={`🔥 ${streak} ${streak === 1 ? "day" : "days"}`}
               />
-            ))}
-          </ScrollView>
-          <Text style={styles.sectionHeading}>🎮 Games</Text>
-          <View style={styles.grid}>
-            {games.map((g, i) => (
-              <GameCard
-                key={g.id}
-                title={g.title}
-                emoji={g.emoji}
-                gradient={g.gradient}
-                stars={stars[g.id] ?? 0}
-                locked={!g.ready}
-                index={i}
-                onPress={() => g.ready && router.push(g.route as Href)}
-              />
-            ))}
+            </View>
+            <View
+              style={[styles.learnHeadingRow, responsiveStyles.learnHeadingRow]}
+            >
+              <Text style={[styles.sectionHeading, styles.learnHeading]}>
+                📚 Learn
+              </Text>
+              <Text style={styles.learnHint}>Swipe →</Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              decelerationRate="fast"
+              snapToInterval={cardWidth + gap}
+              contentContainerStyle={[
+                styles.learnContent,
+                responsiveStyles.learnContent,
+              ]}
+              style={[styles.learnScroll, responsiveStyles.learnScroll]}
+            >
+              {learnModules.map((module, i) => (
+                <GameCard
+                  key={module.id}
+                  title={module.title}
+                  emoji={module.emoji}
+                  gradient={module.gradient}
+                  stars={stars[module.id] ?? 0}
+                  locked={!module.ready}
+                  index={i}
+                  width={cardWidth}
+                  onPress={() =>
+                    module.ready && router.push(module.route as Href)
+                  }
+                />
+              ))}
+            </ScrollView>
+            <Text
+              style={[styles.sectionHeading, responsiveStyles.sectionHeading]}
+            >
+              🎮 Games
+            </Text>
+            <View style={[styles.grid, responsiveStyles.grid]}>
+              {games.map((g, i) => (
+                <GameCard
+                  key={g.id}
+                  title={g.title}
+                  emoji={g.emoji}
+                  gradient={g.gradient}
+                  stars={stars[g.id] ?? 0}
+                  locked={!g.ready}
+                  index={i}
+                  width={cardWidth}
+                  onPress={() => g.ready && router.push(g.route as Href)}
+                />
+              ))}
+            </View>
           </View>
         </ScrollView>
         <PressableScale
-          style={styles.settingsButton}
+          style={[styles.settingsButton, responsiveStyles.settingsButton]}
           onPress={() => router.push("/settings")}
         >
           <Text style={styles.settingsIcon}>⚙️</Text>
@@ -86,13 +130,10 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  content: { padding: spacing.lg },
+  scrollContent: { flexGrow: 1 },
+  content: {},
   settingsButton: {
     position: "absolute",
-    top: spacing.sm,
-    right: spacing.lg,
-    width: 48,
-    height: 48,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.card,
@@ -105,13 +146,11 @@ const styles = StyleSheet.create({
     ...typography.heading,
     color: colors.text,
     textAlign: "left",
-    marginBottom: spacing.md,
   },
   learnHeadingRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacing.md,
   },
   learnHeading: { marginBottom: 0 },
   learnHint: { ...typography.caption, color: colors.textMuted },
@@ -131,12 +170,10 @@ const styles = StyleSheet.create({
   },
   stats: {
     flexDirection: "row",
-    gap: spacing.sm,
-    marginBottom: spacing.xl,
   },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
   },
 });

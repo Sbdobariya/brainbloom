@@ -1,4 +1,5 @@
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect, useRef } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -16,6 +17,14 @@ type Props = {
 };
 
 export function StatChip({ label, value, color = colors.text }: Props) {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    chip: {
+      paddingVertical: s(spacing.md),
+      borderRadius: s(radius.md),
+    },
+    label: { marginTop: s(spacing.xs) },
+  });
   const scale = useSharedValue(1);
   const isFirstRender = useRef(true);
 
@@ -38,11 +47,23 @@ export function StatChip({ label, value, color = colors.text }: Props) {
   }));
 
   return (
-    <View style={styles.chip}>
-      <Animated.Text style={[styles.value, { color }, animatedStyle]}>
+    <View style={[styles.chip, responsiveStyles.chip]}>
+      <Animated.Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.75}
+        style={[styles.value, { color }, animatedStyle]}
+      >
         {value}
       </Animated.Text>
-      <Text style={styles.label}>{label}</Text>
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.75}
+        style={[styles.label, responsiveStyles.label]}
+      >
+        {label}
+      </Text>
     </View>
   );
 }
@@ -51,11 +72,9 @@ const styles = StyleSheet.create({
   chip: {
     flex: 1,
     alignItems: "center",
-    paddingVertical: spacing.md,
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.md,
   },
   value: { ...typography.heading },
   label: {

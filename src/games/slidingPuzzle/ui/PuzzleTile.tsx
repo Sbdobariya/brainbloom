@@ -1,5 +1,5 @@
 import { PressableScale } from "@/core/components/PressableScale";
-import { colors, radius } from "@/core/theme";
+import { colors, radius, typography } from "@/core/theme";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
 import { StyleSheet, Text } from "react-native";
@@ -120,11 +120,11 @@ const styles = StyleSheet.create({
   hinted: { borderWidth: 3, borderColor: colors.text },
   emoji: { textAlign: "center" },
   badge: {
+    ...typography.caption,
     position: "absolute",
     right: 10,
     bottom: 6,
     fontSize: 14,
-    fontWeight: "800",
     color: "rgba(255,255,255,0.85)",
   },
 });

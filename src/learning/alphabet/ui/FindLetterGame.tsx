@@ -5,6 +5,7 @@ import { PressableScale } from "@/core/components/PressableScale";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -15,6 +16,7 @@ const OPTIONS = 3;
 const CHOICE_COLORS = [colors.pink, colors.teal, colors.orange];
 
 export function FindLetterGame() {
+  const { s } = useResponsive();
   const [rounds, setRounds] = useState(() => makeRounds(ROUNDS, OPTIONS));
   const [index, setIndex] = useState(0);
   const [wrong, setWrong] = useState<number[]>([]);
@@ -26,6 +28,7 @@ export function FindLetterGame() {
   const { target } = round;
   const ratio = firstTry / ROUNDS;
   const stars = starsFromRatio(ratio);
+  const speakerSize = Math.max(48, s(56));
 
   const ask = () => speak(`Which letter does ${target.word} start with?`);
 
@@ -100,7 +103,11 @@ export function FindLetterGame() {
         <Text style={styles.question}>
           {solved ? "Great job! 🎉" : "Which letter does it start with?"}
         </Text>
-        <PressableScale style={styles.speaker} haptic={false} onPress={ask}>
+        <PressableScale
+          style={[styles.speaker, { width: speakerSize, height: speakerSize }]}
+          haptic={false}
+          onPress={ask}
+        >
           <Text style={styles.speakerText}>🔊</Text>
         </PressableScale>
       </View>
@@ -153,8 +160,6 @@ const styles = StyleSheet.create({
   word: { ...typography.title, color: colors.text },
   question: { ...typography.body, color: colors.teal, minHeight: 22 },
   speaker: {
-    width: 56,
-    height: 56,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.purple,

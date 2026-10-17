@@ -1,19 +1,21 @@
 import { haptic, playSound, speak } from "@/core/audio/feedback";
 import { GameScreen, ResultModal, StatChip } from "@/core/components";
-import { ChoiceTile } from "@/core/components/ChoiceTile";
 import { PressableScale } from "@/core/components/PressableScale";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { makeColorRounds } from "../logic/findColor";
+import { ColorTile } from "./ColorTile";
 
 const ROUNDS = 8;
 const OPTIONS = 3;
 
 export function FindColorGame() {
+  const { s } = useResponsive();
   const [rounds, setRounds] = useState(() => makeColorRounds(ROUNDS, OPTIONS));
   const [index, setIndex] = useState(0);
   const [wrong, setWrong] = useState<number[]>([]);
@@ -25,6 +27,7 @@ export function FindColorGame() {
   const { target } = round;
   const ratio = firstTry / ROUNDS;
   const stars = starsFromRatio(ratio);
+  const speakerSize = Math.max(48, s(56));
 
   const ask = () => speak(`What color is the ${target.thing}?`);
 
@@ -95,18 +98,20 @@ export function FindColorGame() {
         <Text style={styles.question}>
           {solved ? "Great job! 🎉" : "What color is it?"}
         </Text>
-        <PressableScale style={styles.speaker} haptic={false} onPress={ask}>
+        <PressableScale
+          style={[styles.speaker, { width: speakerSize, height: speakerSize }]}
+          haptic={false}
+          onPress={ask}
+        >
           <Text style={styles.speakerText}>🔊</Text>
         </PressableScale>
       </View>
 
       <View style={styles.choices}>
         {round.options.map((option, i) => (
-          <ChoiceTile
+          <ColorTile
             key={`${index}-${i}`}
-            swatch={option.hex}
-            label={option.name}
-            color={option.hex}
+            hex={option.hex}
             state={
               solved && i === round.answerIndex
                 ? "correct"
@@ -148,8 +153,6 @@ const styles = StyleSheet.create({
   emoji: { fontSize: 100 },
   question: { ...typography.body, color: colors.teal, minHeight: 22 },
   speaker: {
-    width: 56,
-    height: 56,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.purple,

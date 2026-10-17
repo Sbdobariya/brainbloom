@@ -8,6 +8,7 @@ import {
 import { starsForMoves } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, gradients, spacing } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -34,10 +35,8 @@ const PALETTE = [
   colors.teal,
 ];
 
-const TUBE_W = 56;
-const TUBE_H = 190;
-
 export function WaterSortGame() {
+  const { s } = useResponsive();
   const [level, setLevel] = useState(1);
   const [tubes, setTubes] = useState<Tube[]>(() => createLevel(1));
   const [history, setHistory] = useState<Tube[][]>([]);
@@ -130,6 +129,9 @@ export function WaterSortGame() {
     setSelected(null);
   };
 
+  const tubeWidth = Math.max(42, s(56));
+  const tubeHeight = Math.max(120, s(190));
+
   return (
     <GameScreen
       title="Water Sort"
@@ -151,8 +153,8 @@ export function WaterSortGame() {
             key={i}
             layers={tube.map((c) => PALETTE[c % PALETTE.length])}
             selected={selected === i}
-            width={TUBE_W}
-            height={TUBE_H}
+            width={tubeWidth}
+            height={tubeHeight}
             onPress={() => onTubePress(i)}
           />
         ))}

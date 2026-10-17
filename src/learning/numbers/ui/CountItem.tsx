@@ -1,5 +1,6 @@
 import { PressableScale } from "@/core/components/PressableScale";
-import { colors } from "@/core/theme";
+import { colors, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect } from "react";
 import { StyleSheet, Text } from "react-native";
 import Animated, {
@@ -18,8 +19,11 @@ type Props = {
 };
 
 export function CountItem({ emoji, order, color, onPress }: Props) {
+  const { s } = useResponsive();
   const pop = useSharedValue(1);
   const badge = useSharedValue(0);
+  const itemSize = Math.max(52, s(64));
+  const badgeSize = Math.max(18, s(24));
 
   useEffect(() => {
     if (order !== null) {
@@ -49,7 +53,7 @@ export function CountItem({ emoji, order, color, onPress }: Props) {
       disabled={order !== null}
       haptic={false}
       scaleTo={0.88}
-      style={styles.item}
+      style={[styles.item, { width: itemSize, height: itemSize }]}
     >
       <Animated.Text
         style={[styles.emoji, order !== null && styles.counted, emojiStyle]}
@@ -57,7 +61,11 @@ export function CountItem({ emoji, order, color, onPress }: Props) {
         {emoji}
       </Animated.Text>
       <Animated.View
-        style={[styles.badge, { backgroundColor: color }, badgeStyle]}
+        style={[
+          styles.badge,
+          { backgroundColor: color, minWidth: badgeSize, height: badgeSize },
+          badgeStyle,
+        ]}
       >
         <Text style={styles.badgeText}>{order ?? ""}</Text>
       </Animated.View>
@@ -67,8 +75,6 @@ export function CountItem({ emoji, order, color, onPress }: Props) {
 
 const styles = StyleSheet.create({
   item: {
-    width: 64,
-    height: 64,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -78,12 +84,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 0,
     bottom: 0,
-    minWidth: 24,
-    height: 24,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 4,
   },
-  badgeText: { fontSize: 14, fontWeight: "800", color: colors.bg },
+  badgeText: { ...typography.caption, fontSize: 14, color: colors.bg },
 });
