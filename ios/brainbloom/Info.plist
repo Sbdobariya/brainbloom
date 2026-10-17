@@ -28,7 +28,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>brainbloom</string>
-				<string>com.brainbloom</string>
+				<string>app.brainbloom.kids</string>
 			</array>
 		</dict>
 	</array>

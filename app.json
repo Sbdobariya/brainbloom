@@ -9,7 +9,7 @@
     "userInterfaceStyle": "dark",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.brainbloom",
+      "bundleIdentifier": "app.brainbloom.kids",
       "supportsTablet": false
     },
     "android": {
@@ -20,7 +20,7 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.brainbloom",
+      "package": "app.brainbloom.kids",
       "blockedPermissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
