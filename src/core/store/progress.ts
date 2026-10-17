@@ -9,7 +9,10 @@ type ProgressState = {
   plays: Record<string, number>;
   lastPlayed: string | null;
   streak: number;
+  seenHowTo: Record<string, boolean>;
   recordResult: (gameId: string, stars: Stars) => void;
+  markHowToSeen: (id: string) => void;
+  resetSeenHowTo: () => void;
   resetProgress: () => void;
 };
 
@@ -20,6 +23,7 @@ export const useProgress = create<ProgressState>()(
       plays: {},
       lastPlayed: null,
       streak: 0,
+      seenHowTo: {},
       recordResult: (gameId, earnedStars) => {
         const today = toDateKey(new Date());
         set((state) => {
@@ -34,6 +38,11 @@ export const useProgress = create<ProgressState>()(
           };
         });
       },
+      markHowToSeen: (id) =>
+        set((state) => ({
+          seenHowTo: { ...state.seenHowTo, [id]: true },
+        })),
+      resetSeenHowTo: () => set({ seenHowTo: {} }),
       resetProgress: () =>
         set({ stars: {}, plays: {}, lastPlayed: null, streak: 0 }),
     }),

@@ -10,15 +10,26 @@ type Props = {
   subtitle?: string;
   onBack?: () => void;
   right?: ReactNode;
+  onHelp?: () => void;
 };
 
-export function GameHeader({ title, subtitle, onBack, right }: Props) {
+export function GameHeader({ title, subtitle, onBack, right, onHelp }: Props) {
   const { s } = useResponsive();
   const buttonSize = Math.max(MIN_TOUCH, s(48));
+  const rightSlotWidth =
+    buttonSize * (onHelp && right ? 2 : 1) +
+    (onHelp && right ? s(spacing.xs) : 0);
   const responsiveStyles = StyleSheet.create({
     backLabel: { fontSize: s(typography.heading.fontSize) },
     title: { fontSize: s(typography.heading.fontSize) },
     subtitle: { fontSize: s(typography.caption.fontSize) },
+    helpButton: { width: buttonSize, height: buttonSize },
+    helpText: { fontSize: s(typography.heading.fontSize) },
+    rightSlot: {
+      width: rightSlotWidth,
+      flexDirection: "row",
+      gap: s(spacing.xs),
+    },
   });
 
   return (
@@ -71,8 +82,24 @@ export function GameHeader({ title, subtitle, onBack, right }: Props) {
           </Text>
         ) : null}
       </View>
-      <View style={[styles.slot, { width: buttonSize, height: buttonSize }]}>
+      <View
+        style={[
+          styles.slot,
+          { width: rightSlotWidth, height: buttonSize },
+          responsiveStyles.rightSlot,
+        ]}
+      >
         {right}
+        {onHelp ? (
+          <PressableScale
+            onPress={onHelp}
+            accessibilityRole="button"
+            accessibilityLabel="How to play"
+            style={[styles.helpButton, responsiveStyles.helpButton]}
+          >
+            <Text style={[styles.helpText, responsiveStyles.helpText]}>?</Text>
+          </PressableScale>
+        ) : null}
       </View>
     </View>
   );
@@ -112,4 +139,15 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     textAlign: "center",
   },
+  helpButton: {
+    minWidth: MIN_TOUCH,
+    minHeight: MIN_TOUCH,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.card,
+    borderColor: colors.cardBorder,
+    borderWidth: 1,
+    borderRadius: radius.pill,
+  },
+  helpText: { ...typography.heading, color: colors.text },
 });

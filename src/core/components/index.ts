@@ -5,6 +5,7 @@ export { GameHeader } from "./GameHeader";
 export { GameScreen } from "./GameScreen";
 export * from "./GameTabBar";
 export { GradientButton } from "./GradientButton";
+export * from "./HowToPlayOverlay";
 export * from "./ParentalGate";
 export { PressableScale } from "./PressableScale";
 export * from "./ResultModal";

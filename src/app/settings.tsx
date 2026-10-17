@@ -36,6 +36,7 @@ export default function Settings() {
   const hapticsOn = useSettings((state) => state.hapticsOn);
   const setSoundOn = useSettings((state) => state.setSoundOn);
   const setHapticsOn = useSettings((state) => state.setHapticsOn);
+  const resetSeenHowTo = useProgress((state) => state.resetSeenHowTo);
 
   return (
     <GameScreen title="Settings">
@@ -68,6 +69,20 @@ export default function Settings() {
           </Text>
           <ToggleSwitch value={hapticsOn} onChange={setHapticsOn} />
         </View>
+        <PressableScale
+          style={[styles.row, responsiveStyles.row]}
+          haptic={false}
+          onPress={resetSeenHowTo}
+        >
+          <Text style={[styles.emoji, responsiveStyles.emoji]}>💡</Text>
+          <Text
+            style={[styles.label, responsiveStyles.label]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            Show tips again
+          </Text>
+        </PressableScale>
       </View>
       <Text style={[styles.note, responsiveStyles.note]}>
         BrainBloom stores your stars on this device only.

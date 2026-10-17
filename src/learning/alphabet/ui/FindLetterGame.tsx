@@ -1,7 +1,13 @@
 import { haptic, playSound, speak } from "@/core/audio/feedback";
-import { GameScreen, ResultModal, StatChip } from "@/core/components";
+import {
+  GameScreen,
+  HowToPlayOverlay,
+  ResultModal,
+  StatChip,
+} from "@/core/components";
 import { ChoiceTile } from "@/core/components/ChoiceTile";
 import { PressableScale } from "@/core/components/PressableScale";
+import { useHowToPlay } from "@/core/howToPlay/useHowToPlay";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
@@ -16,6 +22,7 @@ const OPTIONS = 3;
 const CHOICE_COLORS = [colors.pink, colors.teal, colors.orange];
 
 export function FindLetterGame() {
+  const help = useHowToPlay("findLetter");
   const { s } = useResponsive();
   const responsiveStyles = StyleSheet.create({
     row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
@@ -57,9 +64,10 @@ export function FindLetterGame() {
 
   // Ask the question out loud at the start of every round
   useEffect(() => {
+    if (help.visible) return;
     ask();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index, rounds]);
+  }, [index, rounds, help.visible]);
 
   // After a correct answer, celebrate for a moment and move on
   useEffect(() => {
@@ -110,64 +118,77 @@ export function FindLetterGame() {
   };
 
   return (
-    <GameScreen title="🔎 Find the Letter" subtitle="Listen and tap">
-      <View style={[styles.row, responsiveStyles.row]}>
-        <StatChip
-          label="ROUND"
-          value={`${index + 1}/${ROUNDS}`}
-          color={colors.teal}
-        />
-        <StatChip label="FIRST TRY" value={firstTry} color={colors.yellow} />
-      </View>
-
-      <View style={[styles.card, responsiveStyles.card]}>
-        <Text style={[styles.emoji, responsiveStyles.emoji]}>
-          {target.emoji}
-        </Text>
-        <Text style={[styles.word, responsiveStyles.word]}>{target.word}</Text>
-        <Text style={[styles.question, responsiveStyles.question]}>
-          {solved ? "Great job! 🎉" : "Which letter does it start with?"}
-        </Text>
-        <PressableScale
-          style={[styles.speaker, responsiveStyles.speaker]}
-          haptic={false}
-          onPress={ask}
-        >
-          <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
-            🔊
-          </Text>
-        </PressableScale>
-      </View>
-
-      <View style={[styles.choices, responsiveStyles.choices]}>
-        {round.options.map((letter, i) => (
-          <ChoiceTile
-            key={`${index}-${i}`}
-            label={letter}
-            color={CHOICE_COLORS[i % CHOICE_COLORS.length]}
-            state={
-              solved && i === round.answerIndex
-                ? "correct"
-                : wrong.includes(i)
-                  ? "wrong"
-                  : "idle"
-            }
-            onPress={() => onPick(i)}
+    <>
+      <GameScreen
+        title="🔎 Find the Letter"
+        subtitle="Listen and tap"
+        onHelp={help.open}
+      >
+        <View style={[styles.row, responsiveStyles.row]}>
+          <StatChip
+            label="ROUND"
+            value={`${index + 1}/${ROUNDS}`}
+            color={colors.teal}
           />
-        ))}
-      </View>
+          <StatChip label="FIRST TRY" value={firstTry} color={colors.yellow} />
+        </View>
 
-      {finished && (
-        <ResultModal
-          kind="win"
-          stars={stars}
-          title="Great learning! 🎉"
-          subtitle={`${firstTry}/${ROUNDS} on the first try`}
-          onPlayAgain={restart}
-          onExit={() => router.back()}
-        />
-      )}
-    </GameScreen>
+        <View style={[styles.card, responsiveStyles.card]}>
+          <Text style={[styles.emoji, responsiveStyles.emoji]}>
+            {target.emoji}
+          </Text>
+          <Text style={[styles.word, responsiveStyles.word]}>
+            {target.word}
+          </Text>
+          <Text style={[styles.question, responsiveStyles.question]}>
+            {solved ? "Great job! 🎉" : "Which letter does it start with?"}
+          </Text>
+          <PressableScale
+            style={[styles.speaker, responsiveStyles.speaker]}
+            haptic={false}
+            onPress={ask}
+          >
+            <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+              🔊
+            </Text>
+          </PressableScale>
+        </View>
+
+        <View style={[styles.choices, responsiveStyles.choices]}>
+          {round.options.map((letter, i) => (
+            <ChoiceTile
+              key={`${index}-${i}`}
+              label={letter}
+              color={CHOICE_COLORS[i % CHOICE_COLORS.length]}
+              state={
+                solved && i === round.answerIndex
+                  ? "correct"
+                  : wrong.includes(i)
+                    ? "wrong"
+                    : "idle"
+              }
+              onPress={() => onPick(i)}
+            />
+          ))}
+        </View>
+
+        {finished && (
+          <ResultModal
+            kind="win"
+            stars={stars}
+            title="Great learning! 🎉"
+            subtitle={`${firstTry}/${ROUNDS} on the first try`}
+            onPlayAgain={restart}
+            onExit={() => router.back()}
+          />
+        )}
+      </GameScreen>
+      <HowToPlayOverlay
+        id="findLetter"
+        visible={help.visible}
+        onClose={help.close}
+      />
+    </>
   );
 }
 

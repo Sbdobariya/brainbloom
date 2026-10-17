@@ -11,10 +11,17 @@ type Props = {
   title: string;
   subtitle?: string;
   right?: ReactNode;
+  onHelp?: () => void;
   children: ReactNode;
 };
 
-export function GameScreen({ title, subtitle, right, children }: Props) {
+export function GameScreen({
+  title,
+  subtitle,
+  right,
+  onHelp,
+  children,
+}: Props) {
   const { contentWidth, padding } = useResponsive();
 
   return (
@@ -25,6 +32,7 @@ export function GameScreen({ title, subtitle, right, children }: Props) {
           subtitle={subtitle}
           onBack={() => router.back()}
           right={right}
+          onHelp={onHelp}
         />
       </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>

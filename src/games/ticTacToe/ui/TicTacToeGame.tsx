@@ -2,10 +2,12 @@ import { haptic, playSound } from "@/core/audio/feedback";
 import {
   GameScreen,
   GradientButton,
+  HowToPlayOverlay,
   ResultModal,
   StatChip,
 } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
+import { useHowToPlay } from "@/core/howToPlay/useHowToPlay";
 import { starsForTicTacToe, type Stars } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
@@ -25,6 +27,7 @@ import {
 import { Cell } from "./Cell";
 
 export function TicTacToeGame() {
+  const help = useHowToPlay("ticTacToe");
   const { width, padding, s } = useResponsive();
   const gap = s(10);
   const maxBoard = Math.min(width - padding * 2, s(380));
@@ -132,90 +135,105 @@ export function TicTacToeGame() {
   const winLine: number[] = result?.line ?? [];
 
   return (
-    <GameScreen title="Tic Tac Toe" subtitle={`vs Computer · ${difficulty}`}>
-      <View style={[styles.row, responsiveStyles.row]}>
-        <StatChip label="YOU" value={scores.you} color={colors.pink} />
-        <StatChip label="DRAWS" value={scores.draws} color={colors.textMuted} />
-        <StatChip label="CPU" value={scores.cpu} color={colors.teal} />
-      </View>
-
-      <Text
-        style={[styles.status, responsiveStyles.statusText]}
-        numberOfLines={1}
-        adjustsFontSizeToFit
+    <>
+      <GameScreen
+        title="Tic Tac Toe"
+        subtitle={`vs Computer · ${difficulty}`}
+        onHelp={help.open}
       >
-        {status}
-      </Text>
+        <View style={[styles.row, responsiveStyles.row]}>
+          <StatChip label="YOU" value={scores.you} color={colors.pink} />
+          <StatChip
+            label="DRAWS"
+            value={scores.draws}
+            color={colors.textMuted}
+          />
+          <StatChip label="CPU" value={scores.cpu} color={colors.teal} />
+        </View>
 
-      <View style={[styles.row, responsiveStyles.row]}>
-        {(["easy", "hard"] as const).map((d) => (
-          <PressableScale
-            key={d}
-            onPress={() => changeDifficulty(d)}
-            style={[
-              styles.chip,
-              responsiveStyles.chip,
-              difficulty === d && styles.chipActive,
-            ]}
-          >
-            <Text
-              style={[styles.chipText, responsiveStyles.chipText]}
-              numberOfLines={1}
-              adjustsFontSizeToFit
+        <Text
+          style={[styles.status, responsiveStyles.statusText]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+        >
+          {status}
+        </Text>
+
+        <View style={[styles.row, responsiveStyles.row]}>
+          {(["easy", "hard"] as const).map((d) => (
+            <PressableScale
+              key={d}
+              onPress={() => changeDifficulty(d)}
+              style={[
+                styles.chip,
+                responsiveStyles.chip,
+                difficulty === d && styles.chipActive,
+              ]}
             >
-              {d === "easy" ? "🙂 Easy" : "💀 Hard"}
-            </Text>
-          </PressableScale>
-        ))}
-      </View>
+              <Text
+                style={[styles.chipText, responsiveStyles.chipText]}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+              >
+                {d === "easy" ? "🙂 Easy" : "💀 Hard"}
+              </Text>
+            </PressableScale>
+          ))}
+        </View>
 
-      <View style={[styles.board, responsiveStyles.board]}>
-        {[0, 1, 2].map((r) => (
-          <View key={r} style={responsiveStyles.boardRow}>
-            {[0, 1, 2].map((c) => {
-              const i = r * 3 + c;
-              const mark = board[i];
-              return (
-                <Cell
-                  key={i}
-                  mark={mark}
-                  size={cellSize}
-                  highlighted={winLine.includes(i)}
-                  disabled={over || turn !== "X" || !!mark}
-                  onPress={() => onCellPress(i)}
-                />
-              );
-            })}
-          </View>
-        ))}
-      </View>
+        <View style={[styles.board, responsiveStyles.board]}>
+          {[0, 1, 2].map((r) => (
+            <View key={r} style={responsiveStyles.boardRow}>
+              {[0, 1, 2].map((c) => {
+                const i = r * 3 + c;
+                const mark = board[i];
+                return (
+                  <Cell
+                    key={i}
+                    mark={mark}
+                    size={cellSize}
+                    highlighted={winLine.includes(i)}
+                    disabled={over || turn !== "X" || !!mark}
+                    onPress={() => onCellPress(i)}
+                  />
+                );
+              })}
+            </View>
+          ))}
+        </View>
 
-      <View style={[styles.footer, responsiveStyles.footer]}>
-        <GradientButton label="New Game" onPress={newRound} />
-      </View>
-      {showResult && (
-        <ResultModal
-          kind={result?.winner === "X" ? "win" : result ? "lose" : "draw"}
-          title={
-            result?.winner === "X"
-              ? "You won! 🎉"
-              : result
-                ? "Nice try!"
-                : "Good game!"
-          }
-          subtitle={
-            result?.winner === "X"
-              ? "Amazing job!"
-              : result
-                ? "Let's try again!"
-                : "It's a draw."
-          }
-          onPlayAgain={newRound}
-          onExit={() => router.back()}
-          stars={stars}
-        />
-      )}
-    </GameScreen>
+        <View style={[styles.footer, responsiveStyles.footer]}>
+          <GradientButton label="New Game" onPress={newRound} />
+        </View>
+        {showResult && (
+          <ResultModal
+            kind={result?.winner === "X" ? "win" : result ? "lose" : "draw"}
+            title={
+              result?.winner === "X"
+                ? "You won! 🎉"
+                : result
+                  ? "Nice try!"
+                  : "Good game!"
+            }
+            subtitle={
+              result?.winner === "X"
+                ? "Amazing job!"
+                : result
+                  ? "Let's try again!"
+                  : "It's a draw."
+            }
+            onPlayAgain={newRound}
+            onExit={() => router.back()}
+            stars={stars}
+          />
+        )}
+      </GameScreen>
+      <HowToPlayOverlay
+        id="ticTacToe"
+        visible={help.visible}
+        onClose={help.close}
+      />
+    </>
   );
 }
 

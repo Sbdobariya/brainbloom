@@ -2,9 +2,11 @@ import { haptic, playSound } from "@/core/audio/feedback";
 import {
   GameScreen,
   GradientButton,
+  HowToPlayOverlay,
   ResultModal,
   StatChip,
 } from "@/core/components";
+import { useHowToPlay } from "@/core/howToPlay/useHowToPlay";
 import { starsForMoves } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, gradients, spacing } from "@/core/theme";
@@ -36,6 +38,7 @@ const PALETTE = [
 ];
 
 export function WaterSortGame() {
+  const help = useHowToPlay("waterSort");
   const { s } = useResponsive();
   const responsiveStyles = StyleSheet.create({
     row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
@@ -143,60 +146,71 @@ export function WaterSortGame() {
   const tubeHeight = Math.max(120, s(190));
 
   return (
-    <GameScreen
-      title="Water Sort"
-      subtitle={`Level ${level} · Sort ${colorCount} colors!`}
-    >
-      <View style={[styles.row, responsiveStyles.row]}>
-        <StatChip label="MOVES" value={moves} color={colors.blue} />
-        <StatChip
-          label="SOLVED"
-          value={`${solvedCount(tubes)}/${colorCount}`}
-          color={colors.green}
-        />
-        <StatChip label="LEVEL" value={level} color={colors.yellow} />
-      </View>
-
-      <View style={[styles.tubes, responsiveStyles.tubes]}>
-        {tubes.map((tube, i) => (
-          <LiquidTube
-            key={i}
-            layers={tube.map((c) => PALETTE[c % PALETTE.length])}
-            selected={selected === i}
-            width={tubeWidth}
-            height={tubeHeight}
-            onPress={() => onTubePress(i)}
-          />
-        ))}
-      </View>
-
-      <View style={[styles.footer, responsiveStyles.footer]}>
+    <>
+      <GameScreen
+        title="Water Sort"
+        subtitle={`Level ${level} · Sort ${colorCount} colors!`}
+        onHelp={help.open}
+      >
         <View style={[styles.row, responsiveStyles.row]}>
-          <View style={styles.flex}>
-            <GradientButton
-              label="↩️ Undo"
-              colors={gradients.cool}
-              onPress={undo}
+          <StatChip label="MOVES" value={moves} color={colors.blue} />
+          <StatChip
+            label="SOLVED"
+            value={`${solvedCount(tubes)}/${colorCount}`}
+            color={colors.green}
+          />
+          <StatChip label="LEVEL" value={level} color={colors.yellow} />
+        </View>
+
+        <View style={[styles.tubes, responsiveStyles.tubes]}>
+          {tubes.map((tube, i) => (
+            <LiquidTube
+              key={i}
+              layers={tube.map((c) => PALETTE[c % PALETTE.length])}
+              selected={selected === i}
+              width={tubeWidth}
+              height={tubeHeight}
+              onPress={() => onTubePress(i)}
             />
-          </View>
-          <View style={styles.flex}>
-            <GradientButton label="🔄 Reset" onPress={() => loadLevel(level)} />
+          ))}
+        </View>
+
+        <View style={[styles.footer, responsiveStyles.footer]}>
+          <View style={[styles.row, responsiveStyles.row]}>
+            <View style={styles.flex}>
+              <GradientButton
+                label="↩️ Undo"
+                colors={gradients.cool}
+                onPress={undo}
+              />
+            </View>
+            <View style={styles.flex}>
+              <GradientButton
+                label="🔄 Reset"
+                onPress={() => loadLevel(level)}
+              />
+            </View>
           </View>
         </View>
-      </View>
 
-      {showResult && (
-        <ResultModal
-          kind="win"
-          title="Level complete! 🎉"
-          subtitle={`${moves} moves`}
-          playAgainLabel="Next level"
-          onPlayAgain={() => loadLevel(level + 1)}
-          onExit={() => router.back()}
-          stars={stars}
-        />
-      )}
-    </GameScreen>
+        {showResult && (
+          <ResultModal
+            kind="win"
+            title="Level complete! 🎉"
+            subtitle={`${moves} moves`}
+            playAgainLabel="Next level"
+            onPlayAgain={() => loadLevel(level + 1)}
+            onExit={() => router.back()}
+            stars={stars}
+          />
+        )}
+      </GameScreen>
+      <HowToPlayOverlay
+        id="waterSort"
+        visible={help.visible}
+        onClose={help.close}
+      />
+    </>
   );
 }
 

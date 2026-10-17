@@ -1,6 +1,7 @@
 import { playSound, speak } from "@/core/audio/feedback";
-import { GameScreen } from "@/core/components";
+import { GameScreen, HowToPlayOverlay } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
+import { useHowToPlay } from "@/core/howToPlay/useHowToPlay";
 import { colors, radius, spacing, typography } from "@/core/theme";
 import { useResponsive } from "@/core/theme/responsive";
 import { useEffect, useState } from "react";
@@ -27,11 +28,16 @@ const CARD_COLORS = [
 const sayIt = (item: LetterItem) =>
   speak(`${item.letter}. ${item.letter} is for ${item.word}`);
 
-type CardProps = { item: LetterItem; color: string; dir: 1 | -1 };
+type CardProps = {
+  item: LetterItem;
+  color: string;
+  dir: 1 | -1;
+  audioEnabled: boolean;
+};
 
 // This component is re-created (via key) for every letter, so its starting
 // values below act as the "enter from the side" animation.
-function LetterCard({ item, color, dir }: CardProps) {
+function LetterCard({ item, color, dir, audioEnabled }: CardProps) {
   const { s } = useResponsive();
   const responsiveStyles = StyleSheet.create({
     card: {
@@ -53,8 +59,8 @@ function LetterCard({ item, color, dir }: CardProps) {
   useEffect(() => {
     x.value = withSpring(0, { damping: 16, stiffness: 180 });
     opacity.value = withTiming(1, { duration: 220 });
-    sayIt(item); // read the letter out loud as soon as it appears
-  }, [item, x, opacity]);
+    if (audioEnabled) sayIt(item);
+  }, [item, x, opacity, audioEnabled]);
 
   const cardStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -109,6 +115,7 @@ function LetterCard({ item, color, dir }: CardProps) {
 }
 
 export function AlphabetScreen() {
+  const help = useHowToPlay("alphabet");
   const { s } = useResponsive();
   const responsiveStyles = StyleSheet.create({
     progress: {
@@ -145,53 +152,70 @@ export function AlphabetScreen() {
   };
 
   return (
-    <GameScreen title="🔤 ABC" subtitle="Learn the alphabet">
-      <Text style={[styles.progress, responsiveStyles.progress]}>
-        {index + 1} / {alphabet.length}
-      </Text>
+    <>
+      <GameScreen
+        title="🔤 ABC"
+        subtitle="Learn the alphabet"
+        onHelp={help.open}
+      >
+        <Text style={[styles.progress, responsiveStyles.progress]}>
+          {index + 1} / {alphabet.length}
+        </Text>
 
-      <View style={styles.stage}>
-        <LetterCard key={index} item={item} color={color} dir={dir} />
-      </View>
+        <View style={styles.stage}>
+          <LetterCard
+            key={index}
+            item={item}
+            color={color}
+            dir={dir}
+            audioEnabled={!help.visible}
+          />
+        </View>
 
-      <View style={[styles.nav, responsiveStyles.nav]}>
-        <PressableScale
-          style={[
-            styles.navButton,
-            responsiveStyles.navButton,
-            index === 0 && styles.navDisabled,
-          ]}
-          disabled={index === 0}
-          haptic={false}
-          onPress={() => go(-1)}
-        >
-          <Text style={[styles.navText, responsiveStyles.navText]}>◀</Text>
-        </PressableScale>
+        <View style={[styles.nav, responsiveStyles.nav]}>
+          <PressableScale
+            style={[
+              styles.navButton,
+              responsiveStyles.navButton,
+              index === 0 && styles.navDisabled,
+            ]}
+            disabled={index === 0}
+            haptic={false}
+            onPress={() => go(-1)}
+          >
+            <Text style={[styles.navText, responsiveStyles.navText]}>◀</Text>
+          </PressableScale>
 
-        <PressableScale
-          style={[styles.speaker, responsiveStyles.speaker]}
-          haptic={false}
-          onPress={() => sayIt(item)}
-        >
-          <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
-            🔊
-          </Text>
-        </PressableScale>
+          <PressableScale
+            style={[styles.speaker, responsiveStyles.speaker]}
+            haptic={false}
+            onPress={() => sayIt(item)}
+          >
+            <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+              🔊
+            </Text>
+          </PressableScale>
 
-        <PressableScale
-          style={[
-            styles.navButton,
-            responsiveStyles.navButton,
-            index === alphabet.length - 1 && styles.navDisabled,
-          ]}
-          disabled={index === alphabet.length - 1}
-          haptic={false}
-          onPress={() => go(1)}
-        >
-          <Text style={[styles.navText, responsiveStyles.navText]}>▶</Text>
-        </PressableScale>
-      </View>
-    </GameScreen>
+          <PressableScale
+            style={[
+              styles.navButton,
+              responsiveStyles.navButton,
+              index === alphabet.length - 1 && styles.navDisabled,
+            ]}
+            disabled={index === alphabet.length - 1}
+            haptic={false}
+            onPress={() => go(1)}
+          >
+            <Text style={[styles.navText, responsiveStyles.navText]}>▶</Text>
+          </PressableScale>
+        </View>
+      </GameScreen>
+      <HowToPlayOverlay
+        id="alphabet"
+        visible={help.visible}
+        onClose={help.close}
+      />
+    </>
   );
 }
 

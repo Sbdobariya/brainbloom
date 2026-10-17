@@ -1,6 +1,12 @@
 import { haptic, playSound, speak } from "@/core/audio/feedback";
-import { GameScreen, ResultModal, StatChip } from "@/core/components";
+import {
+  GameScreen,
+  HowToPlayOverlay,
+  ResultModal,
+  StatChip,
+} from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
+import { useHowToPlay } from "@/core/howToPlay/useHowToPlay";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
@@ -15,6 +21,7 @@ const ROUNDS = 8;
 const OPTIONS = 3;
 
 export function FindColorGame() {
+  const help = useHowToPlay("findColor");
   const { s } = useResponsive();
   const responsiveStyles = StyleSheet.create({
     row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
@@ -54,9 +61,10 @@ export function FindColorGame() {
   const ask = () => speak(`What color is the ${target.thing}?`);
 
   useEffect(() => {
+    if (help.visible) return;
     ask();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index, rounds]);
+  }, [index, rounds, help.visible]);
 
   useEffect(() => {
     if (!solved) return;
@@ -105,62 +113,73 @@ export function FindColorGame() {
   };
 
   return (
-    <GameScreen title="🖍️ Name the Color" subtitle="Look and tap">
-      <View style={[styles.row, responsiveStyles.row]}>
-        <StatChip
-          label="ROUND"
-          value={`${index + 1}/${ROUNDS}`}
-          color={colors.teal}
-        />
-        <StatChip label="FIRST TRY" value={firstTry} color={colors.yellow} />
-      </View>
-
-      <View style={[styles.card, responsiveStyles.card]}>
-        <Text style={[styles.emoji, responsiveStyles.emoji]}>
-          {target.emoji}
-        </Text>
-        <Text style={[styles.question, responsiveStyles.question]}>
-          {solved ? "Great job! 🎉" : "What color is it?"}
-        </Text>
-        <PressableScale
-          style={[styles.speaker, responsiveStyles.speaker]}
-          haptic={false}
-          onPress={ask}
-        >
-          <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
-            🔊
-          </Text>
-        </PressableScale>
-      </View>
-
-      <View style={[styles.choices, responsiveStyles.choices]}>
-        {round.options.map((option, i) => (
-          <ColorTile
-            key={`${index}-${i}`}
-            hex={option.hex}
-            state={
-              solved && i === round.answerIndex
-                ? "correct"
-                : wrong.includes(i)
-                  ? "wrong"
-                  : "idle"
-            }
-            onPress={() => onPick(i)}
+    <>
+      <GameScreen
+        title="🖍️ Name the Color"
+        subtitle="Look and tap"
+        onHelp={help.open}
+      >
+        <View style={[styles.row, responsiveStyles.row]}>
+          <StatChip
+            label="ROUND"
+            value={`${index + 1}/${ROUNDS}`}
+            color={colors.teal}
           />
-        ))}
-      </View>
+          <StatChip label="FIRST TRY" value={firstTry} color={colors.yellow} />
+        </View>
 
-      {finished && (
-        <ResultModal
-          kind="win"
-          stars={stars}
-          title="Great learning! 🎉"
-          subtitle={`${firstTry}/${ROUNDS} on the first try`}
-          onPlayAgain={restart}
-          onExit={() => router.back()}
-        />
-      )}
-    </GameScreen>
+        <View style={[styles.card, responsiveStyles.card]}>
+          <Text style={[styles.emoji, responsiveStyles.emoji]}>
+            {target.emoji}
+          </Text>
+          <Text style={[styles.question, responsiveStyles.question]}>
+            {solved ? "Great job! 🎉" : "What color is it?"}
+          </Text>
+          <PressableScale
+            style={[styles.speaker, responsiveStyles.speaker]}
+            haptic={false}
+            onPress={ask}
+          >
+            <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+              🔊
+            </Text>
+          </PressableScale>
+        </View>
+
+        <View style={[styles.choices, responsiveStyles.choices]}>
+          {round.options.map((option, i) => (
+            <ColorTile
+              key={`${index}-${i}`}
+              hex={option.hex}
+              state={
+                solved && i === round.answerIndex
+                  ? "correct"
+                  : wrong.includes(i)
+                    ? "wrong"
+                    : "idle"
+              }
+              onPress={() => onPick(i)}
+            />
+          ))}
+        </View>
+
+        {finished && (
+          <ResultModal
+            kind="win"
+            stars={stars}
+            title="Great learning! 🎉"
+            subtitle={`${firstTry}/${ROUNDS} on the first try`}
+            onPlayAgain={restart}
+            onExit={() => router.back()}
+          />
+        )}
+      </GameScreen>
+      <HowToPlayOverlay
+        id="findColor"
+        visible={help.visible}
+        onClose={help.close}
+      />
+    </>
   );
 }
 

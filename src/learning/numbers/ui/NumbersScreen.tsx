@@ -1,6 +1,7 @@
 import { haptic, playSound, speak } from "@/core/audio/feedback";
-import { GameScreen } from "@/core/components";
+import { GameScreen, HowToPlayOverlay } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
+import { useHowToPlay } from "@/core/howToPlay/useHowToPlay";
 import { colors, radius, spacing, typography } from "@/core/theme";
 import { useResponsive } from "@/core/theme/responsive";
 import { useEffect, useState } from "react";
@@ -27,10 +28,15 @@ const COLORS = [
 
 const CAPITAL = (w: string) => w[0].toUpperCase() + w.slice(1);
 
-type CardProps = { item: NumberItem; color: string; dir: 1 | -1 };
+type CardProps = {
+  item: NumberItem;
+  color: string;
+  dir: 1 | -1;
+  audioEnabled: boolean;
+};
 
 // Re-created (via key) for every number, so its state starts fresh each time
-function NumberCard({ item, color, dir }: CardProps) {
+function NumberCard({ item, color, dir, audioEnabled }: CardProps) {
   const { s } = useResponsive();
   const itemSize = Math.max(48, s(64));
   const itemGap = s(spacing.xs);
@@ -66,8 +72,8 @@ function NumberCard({ item, color, dir }: CardProps) {
   useEffect(() => {
     x.value = withSpring(0, { damping: 16, stiffness: 180 });
     opacity.value = withTiming(1, { duration: 220 });
-    speak(`${CAPITAL(item.word)}. Can you count them?`);
-  }, [item, x, opacity]);
+    if (audioEnabled) speak(`${CAPITAL(item.word)}. Can you count them?`);
+  }, [item, x, opacity, audioEnabled]);
 
   const cardStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -150,6 +156,7 @@ function NumberCard({ item, color, dir }: CardProps) {
 }
 
 export function NumbersScreen() {
+  const help = useHowToPlay("numbers");
   const { s } = useResponsive();
   const responsiveStyles = StyleSheet.create({
     progress: {
@@ -186,53 +193,66 @@ export function NumbersScreen() {
   };
 
   return (
-    <GameScreen title="🔢 123" subtitle="Learn to count">
-      <Text style={[styles.progress, responsiveStyles.progress]}>
-        {index + 1} / {numbers.length}
-      </Text>
+    <>
+      <GameScreen title="🔢 123" subtitle="Learn to count" onHelp={help.open}>
+        <Text style={[styles.progress, responsiveStyles.progress]}>
+          {index + 1} / {numbers.length}
+        </Text>
 
-      <View style={styles.stage}>
-        <NumberCard key={index} item={item} color={color} dir={dir} />
-      </View>
+        <View style={styles.stage}>
+          <NumberCard
+            key={index}
+            item={item}
+            color={color}
+            dir={dir}
+            audioEnabled={!help.visible}
+          />
+        </View>
 
-      <View style={[styles.nav, responsiveStyles.nav]}>
-        <PressableScale
-          style={[
-            styles.navButton,
-            responsiveStyles.navButton,
-            index === 0 && styles.navDisabled,
-          ]}
-          disabled={index === 0}
-          haptic={false}
-          onPress={() => go(-1)}
-        >
-          <Text style={[styles.navText, responsiveStyles.navText]}>◀</Text>
-        </PressableScale>
+        <View style={[styles.nav, responsiveStyles.nav]}>
+          <PressableScale
+            style={[
+              styles.navButton,
+              responsiveStyles.navButton,
+              index === 0 && styles.navDisabled,
+            ]}
+            disabled={index === 0}
+            haptic={false}
+            onPress={() => go(-1)}
+          >
+            <Text style={[styles.navText, responsiveStyles.navText]}>◀</Text>
+          </PressableScale>
 
-        <PressableScale
-          style={[styles.speaker, responsiveStyles.speaker]}
-          haptic={false}
-          onPress={() => speak(`${CAPITAL(item.word)}. Can you count them?`)}
-        >
-          <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
-            🔊
-          </Text>
-        </PressableScale>
+          <PressableScale
+            style={[styles.speaker, responsiveStyles.speaker]}
+            haptic={false}
+            onPress={() => speak(`${CAPITAL(item.word)}. Can you count them?`)}
+          >
+            <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+              🔊
+            </Text>
+          </PressableScale>
 
-        <PressableScale
-          style={[
-            styles.navButton,
-            responsiveStyles.navButton,
-            index === numbers.length - 1 && styles.navDisabled,
-          ]}
-          disabled={index === numbers.length - 1}
-          haptic={false}
-          onPress={() => go(1)}
-        >
-          <Text style={[styles.navText, responsiveStyles.navText]}>▶</Text>
-        </PressableScale>
-      </View>
-    </GameScreen>
+          <PressableScale
+            style={[
+              styles.navButton,
+              responsiveStyles.navButton,
+              index === numbers.length - 1 && styles.navDisabled,
+            ]}
+            disabled={index === numbers.length - 1}
+            haptic={false}
+            onPress={() => go(1)}
+          >
+            <Text style={[styles.navText, responsiveStyles.navText]}>▶</Text>
+          </PressableScale>
+        </View>
+      </GameScreen>
+      <HowToPlayOverlay
+        id="numbers"
+        visible={help.visible}
+        onClose={help.close}
+      />
+    </>
   );
 }
 

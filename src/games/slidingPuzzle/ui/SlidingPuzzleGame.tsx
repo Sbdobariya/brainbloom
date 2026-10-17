@@ -2,10 +2,12 @@ import { haptic, playSound } from "@/core/audio/feedback";
 import {
   GameScreen,
   GradientButton,
+  HowToPlayOverlay,
   ResultModal,
   StatChip,
 } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
+import { useHowToPlay } from "@/core/howToPlay/useHowToPlay";
 import { starsForMoves } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, gradients, radius, spacing, typography } from "@/core/theme";
@@ -51,6 +53,7 @@ const formatTime = (s: number) =>
   `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
 export function SlidingPuzzleGame() {
+  const help = useHowToPlay("slidingPuzzle");
   const { width, height, padding, s } = useResponsive();
   const gap = s(8);
   const pad = s(10);
@@ -102,10 +105,10 @@ export function SlidingPuzzleGame() {
 
   // Timer runs until the puzzle is solved
   useEffect(() => {
-    if (solved) return;
+    if (solved || help.visible) return;
     const id = setInterval(() => setSeconds((s) => s + 1), 1000);
     return () => clearInterval(id);
-  }, [solved]);
+  }, [solved, help.visible]);
 
   // Let the last tile slide into place, then celebrate
   useEffect(() => {
@@ -157,92 +160,107 @@ export function SlidingPuzzleGame() {
   };
 
   return (
-    <GameScreen title="Puzzle World" subtitle="Sliding Tile Puzzle">
-      <View style={[styles.row, responsiveStyles.row]}>
-        <StatChip label="MOVES" value={moves} color={colors.teal} />
-        <StatChip
-          label="TIME"
-          value={formatTime(seconds)}
-          color={colors.yellow}
-        />
-        <StatChip label="SIZE" value={`${size}×${size}`} color={colors.pink} />
-      </View>
-
-      <View style={[styles.row, responsiveStyles.row]}>
-        {SIZES.map((s) => (
-          <PressableScale
-            key={s}
-            onPress={() => startNew(s)}
-            style={[
-              styles.chip,
-              responsiveStyles.chips,
-              size === s && styles.chipActive,
-            ]}
-          >
-            <Text style={[styles.chipText, responsiveStyles.chipText]}>
-              {s === 3 ? "😊" : "⚡"} {s}×{s}
-            </Text>
-          </PressableScale>
-        ))}
-      </View>
-
-      <View
-        style={[
-          styles.board,
-          responsiveStyles.board,
-          { width: boardPx, height: boardPx },
-        ]}
+    <>
+      <GameScreen
+        title="Puzzle World"
+        subtitle="Sliding Tile Puzzle"
+        onHelp={help.open}
       >
-        <View style={responsiveStyles.boardInner}>
-          {board.map((value, index) =>
-            value === 0 ? null : (
-              <PuzzleTile
-                key={value} // stable key: the tile keeps its identity and animates to new slots
-                value={value}
-                index={index}
-                size={size}
-                tileSize={tileSize}
-                gap={gap}
-                emoji={EMOJIS[value - 1]}
-                gradient={TILE_GRADIENTS[value % TILE_GRADIENTS.length]}
-                hinted={hintTile === value}
-                onPress={() => onTilePress(index)}
-              />
-            ),
-          )}
-        </View>
-      </View>
-
-      <Text style={[styles.goal, responsiveStyles.goal]}>
-        Put the tiles in order: 1, 2, 3 …
-      </Text>
-
-      <View style={[styles.footer, responsiveStyles.footer]}>
         <View style={[styles.row, responsiveStyles.row]}>
-          <View style={styles.flex}>
-            <GradientButton
-              label="💡 Hint"
-              colors={gradients.gold}
-              onPress={onHint}
-            />
-          </View>
-          <View style={styles.flex}>
-            <GradientButton label="🔀 New" onPress={() => startNew()} />
+          <StatChip label="MOVES" value={moves} color={colors.teal} />
+          <StatChip
+            label="TIME"
+            value={formatTime(seconds)}
+            color={colors.yellow}
+          />
+          <StatChip
+            label="SIZE"
+            value={`${size}×${size}`}
+            color={colors.pink}
+          />
+        </View>
+
+        <View style={[styles.row, responsiveStyles.row]}>
+          {SIZES.map((s) => (
+            <PressableScale
+              key={s}
+              onPress={() => startNew(s)}
+              style={[
+                styles.chip,
+                responsiveStyles.chips,
+                size === s && styles.chipActive,
+              ]}
+            >
+              <Text style={[styles.chipText, responsiveStyles.chipText]}>
+                {s === 3 ? "😊" : "⚡"} {s}×{s}
+              </Text>
+            </PressableScale>
+          ))}
+        </View>
+
+        <View
+          style={[
+            styles.board,
+            responsiveStyles.board,
+            { width: boardPx, height: boardPx },
+          ]}
+        >
+          <View style={responsiveStyles.boardInner}>
+            {board.map((value, index) =>
+              value === 0 ? null : (
+                <PuzzleTile
+                  key={value} // stable key: the tile keeps its identity and animates to new slots
+                  value={value}
+                  index={index}
+                  size={size}
+                  tileSize={tileSize}
+                  gap={gap}
+                  emoji={EMOJIS[value - 1]}
+                  gradient={TILE_GRADIENTS[value % TILE_GRADIENTS.length]}
+                  hinted={hintTile === value}
+                  onPress={() => onTilePress(index)}
+                />
+              ),
+            )}
           </View>
         </View>
-      </View>
 
-      {showResult && (
-        <ResultModal
-          kind="win"
-          title="Puzzle solved! 🎉"
-          subtitle={`${moves} moves · ${formatTime(seconds)}`}
-          onPlayAgain={() => startNew()}
-          onExit={() => router.back()}
-          stars={stars}
-        />
-      )}
-    </GameScreen>
+        <Text style={[styles.goal, responsiveStyles.goal]}>
+          Put the tiles in order: 1, 2, 3 …
+        </Text>
+
+        <View style={[styles.footer, responsiveStyles.footer]}>
+          <View style={[styles.row, responsiveStyles.row]}>
+            <View style={styles.flex}>
+              <GradientButton
+                label="💡 Hint"
+                colors={gradients.gold}
+                onPress={onHint}
+              />
+            </View>
+            <View style={styles.flex}>
+              <GradientButton label="🔀 New" onPress={() => startNew()} />
+            </View>
+          </View>
+        </View>
+
+        {showResult && (
+          <ResultModal
+            kind="win"
+            title="Puzzle solved! 🎉"
+            subtitle={`${moves} moves · ${formatTime(seconds)}`}
+            onPlayAgain={() => startNew()}
+            onExit={() => router.back()}
+            stars={stars}
+          />
+        )}
+      </GameScreen>
+      <HowToPlayOverlay
+        id="slidingPuzzle"
+        visible={help.visible}
+        onClose={help.close}
+      />
+    </>
   );
 }
 

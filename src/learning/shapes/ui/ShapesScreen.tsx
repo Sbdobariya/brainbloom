@@ -1,6 +1,7 @@
 import { playSound, speak } from "@/core/audio/feedback";
-import { GameScreen } from "@/core/components";
+import { GameScreen, HowToPlayOverlay } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
+import { useHowToPlay } from "@/core/howToPlay/useHowToPlay";
 import { colors, radius, spacing, typography } from "@/core/theme";
 import { useResponsive } from "@/core/theme/responsive";
 import { useEffect, useState } from "react";
@@ -27,10 +28,15 @@ const SHAPE_COLORS = [
 ];
 const sayIt = (item: ShapeItem) => speak(`${item.name}. ${item.fact}`);
 
-type CardProps = { item: ShapeItem; color: string; dir: 1 | -1 };
+type CardProps = {
+  item: ShapeItem;
+  color: string;
+  dir: 1 | -1;
+  audioEnabled: boolean;
+};
 
 // Re-created (via key) for every shape: slides in and speaks on mount
-function ShapeCard({ item, color, dir }: CardProps) {
+function ShapeCard({ item, color, dir, audioEnabled }: CardProps) {
   const { s } = useResponsive();
   const responsiveStyles = StyleSheet.create({
     card: {
@@ -56,8 +62,8 @@ function ShapeCard({ item, color, dir }: CardProps) {
   useEffect(() => {
     x.value = withSpring(0, { damping: 16, stiffness: 180 });
     opacity.value = withTiming(1, { duration: 220 });
-    sayIt(item);
-  }, [item, x, opacity]);
+    if (audioEnabled) sayIt(item);
+  }, [item, x, opacity, audioEnabled]);
 
   const cardStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -112,6 +118,7 @@ function ShapeCard({ item, color, dir }: CardProps) {
 }
 
 export function ShapesScreen() {
+  const help = useHowToPlay("shapes");
   const { s } = useResponsive();
   const responsiveStyles = StyleSheet.create({
     progress: {
@@ -148,53 +155,70 @@ export function ShapesScreen() {
   };
 
   return (
-    <GameScreen title="🔷 Shapes" subtitle="Learn the shapes">
-      <Text style={[styles.progress, responsiveStyles.progress]}>
-        {index + 1} / {shapes.length}
-      </Text>
+    <>
+      <GameScreen
+        title="🔷 Shapes"
+        subtitle="Learn the shapes"
+        onHelp={help.open}
+      >
+        <Text style={[styles.progress, responsiveStyles.progress]}>
+          {index + 1} / {shapes.length}
+        </Text>
 
-      <View style={styles.stage}>
-        <ShapeCard key={index} item={item} color={color} dir={dir} />
-      </View>
+        <View style={styles.stage}>
+          <ShapeCard
+            key={index}
+            item={item}
+            color={color}
+            dir={dir}
+            audioEnabled={!help.visible}
+          />
+        </View>
 
-      <View style={[styles.nav, responsiveStyles.nav]}>
-        <PressableScale
-          style={[
-            styles.navButton,
-            responsiveStyles.navButton,
-            index === 0 && styles.navDisabled,
-          ]}
-          disabled={index === 0}
-          haptic={false}
-          onPress={() => go(-1)}
-        >
-          <Text style={[styles.navText, responsiveStyles.navText]}>◀</Text>
-        </PressableScale>
+        <View style={[styles.nav, responsiveStyles.nav]}>
+          <PressableScale
+            style={[
+              styles.navButton,
+              responsiveStyles.navButton,
+              index === 0 && styles.navDisabled,
+            ]}
+            disabled={index === 0}
+            haptic={false}
+            onPress={() => go(-1)}
+          >
+            <Text style={[styles.navText, responsiveStyles.navText]}>◀</Text>
+          </PressableScale>
 
-        <PressableScale
-          style={[styles.speaker, responsiveStyles.speaker]}
-          haptic={false}
-          onPress={() => sayIt(item)}
-        >
-          <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
-            🔊
-          </Text>
-        </PressableScale>
+          <PressableScale
+            style={[styles.speaker, responsiveStyles.speaker]}
+            haptic={false}
+            onPress={() => sayIt(item)}
+          >
+            <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+              🔊
+            </Text>
+          </PressableScale>
 
-        <PressableScale
-          style={[
-            styles.navButton,
-            responsiveStyles.navButton,
-            index === shapes.length - 1 && styles.navDisabled,
-          ]}
-          disabled={index === shapes.length - 1}
-          haptic={false}
-          onPress={() => go(1)}
-        >
-          <Text style={[styles.navText, responsiveStyles.navText]}>▶</Text>
-        </PressableScale>
-      </View>
-    </GameScreen>
+          <PressableScale
+            style={[
+              styles.navButton,
+              responsiveStyles.navButton,
+              index === shapes.length - 1 && styles.navDisabled,
+            ]}
+            disabled={index === shapes.length - 1}
+            haptic={false}
+            onPress={() => go(1)}
+          >
+            <Text style={[styles.navText, responsiveStyles.navText]}>▶</Text>
+          </PressableScale>
+        </View>
+      </GameScreen>
+      <HowToPlayOverlay
+        id="shapes"
+        visible={help.visible}
+        onClose={help.close}
+      />
+    </>
   );
 }
 

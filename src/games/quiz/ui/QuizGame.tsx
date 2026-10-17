@@ -1,5 +1,12 @@
 import { haptic, playSound } from "@/core/audio/feedback";
-import { GameScreen, ResultModal, StatChip, TimerBar } from "@/core/components";
+import {
+  GameScreen,
+  HowToPlayOverlay,
+  ResultModal,
+  StatChip,
+  TimerBar,
+} from "@/core/components";
+import { useHowToPlay } from "@/core/howToPlay/useHowToPlay";
 import { starsFromRatio } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
@@ -20,6 +27,7 @@ const LETTERS = ["A", "B", "C", "D"];
 type Status = "playing" | "correct" | "wrong" | "timeout";
 
 export function QuizGame() {
+  const help = useHowToPlay("quiz");
   const { width, contentWidth, padding, s } = useResponsive();
   const optionsGap = s(spacing.md);
   const availableWidth = Math.min(width, contentWidth) - padding * 2;
@@ -80,10 +88,10 @@ export function QuizGame() {
 
   // Countdown, only while a question is open
   useEffect(() => {
-    if (status !== "playing" || finished) return;
+    if (status !== "playing" || finished || help.visible) return;
     const id = setInterval(() => setSecondsLeft((s) => s - 1), 1000);
     return () => clearInterval(id);
-  }, [status, finished, index]);
+  }, [status, finished, index, help.visible]);
 
   // Time is up: show the answer, reset the streak
   useEffect(() => {
@@ -184,103 +192,110 @@ export function QuizGame() {
           : "";
 
   return (
-    <GameScreen title="🧠 Brain Boost" subtitle="Speed Quiz">
-      <View style={[styles.row, responsiveStyles.row]}>
-        <StatChip label="SCORE" value={score} color={colors.yellow} />
-        <StatChip label="STREAK" value={`${streak}x`} color={colors.pink} />
-        <StatChip
-          label="CORRECT"
-          value={`${correctCount}/${QUESTIONS}`}
-          color={colors.teal}
-        />
-        <StatChip
-          label="QUESTION"
-          value={`${index + 1}/${QUESTIONS}`}
-          color={colors.purple}
-        />
-      </View>
+    <>
+      <GameScreen
+        title="🧠 Brain Boost"
+        subtitle="Speed Quiz"
+        onHelp={help.open}
+      >
+        <View style={[styles.row, responsiveStyles.row]}>
+          <StatChip label="SCORE" value={score} color={colors.yellow} />
+          <StatChip label="STREAK" value={`${streak}x`} color={colors.pink} />
+          <StatChip
+            label="CORRECT"
+            value={`${correctCount}/${QUESTIONS}`}
+            color={colors.teal}
+          />
+          <StatChip
+            label="QUESTION"
+            value={`${index + 1}/${QUESTIONS}`}
+            color={colors.purple}
+          />
+        </View>
 
-      <View style={[styles.timer, responsiveStyles.timer]}>
-        <TimerBar key={index} progress={Math.min(secondsLeft / SECONDS, 1)} />
-        <Text style={[styles.seconds, responsiveStyles.seconds]}>
-          {Math.max(secondsLeft, 0)}s
-        </Text>
-      </View>
-
-      <View style={[styles.card, responsiveStyles.card]}>
-        <View style={[styles.tag, responsiveStyles.tag]}>
-          <Text
-            style={[styles.tagText, responsiveStyles.tagText]}
-            numberOfLines={1}
-            adjustsFontSizeToFit
-          >
-            {info.emoji} {info.title.toUpperCase()}
+        <View style={[styles.timer, responsiveStyles.timer]}>
+          <TimerBar key={index} progress={Math.min(secondsLeft / SECONDS, 1)} />
+          <Text style={[styles.seconds, responsiveStyles.seconds]}>
+            {Math.max(secondsLeft, 0)}s
           </Text>
         </View>
-        <Text
-          style={[styles.prompt, responsiveStyles.prompt]}
-          adjustsFontSizeToFit
-          minimumFontScale={0.75}
-        >
-          {q.prompt}
-        </Text>
-        <Text style={[styles.message, responsiveStyles.message]}>
-          {message}
-        </Text>
-      </View>
 
-      <View style={[styles.options, responsiveStyles.options]}>
-        {Array.from({ length: Math.ceil(q.options.length / 2) }, (_, row) => (
-          <View key={row} style={responsiveStyles.optionRow}>
-            {q.options.slice(row * 2, row * 2 + 2).map((o, col) => {
-              const i = row * 2 + col;
-              return (
-                <OptionButton
-                  key={`${q.id}-${i}`}
-                  width={optionWidth}
-                  letter={LETTERS[i]}
-                  label={o}
-                  state={optionState(i)}
-                  onPress={() => onAnswer(i)}
-                />
-              );
-            })}
+        <View style={[styles.card, responsiveStyles.card]}>
+          <View style={[styles.tag, responsiveStyles.tag]}>
+            <Text
+              style={[styles.tagText, responsiveStyles.tagText]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
+              {info.emoji} {info.title.toUpperCase()}
+            </Text>
           </View>
-        ))}
-      </View>
+          <Text
+            style={[styles.prompt, responsiveStyles.prompt]}
+            adjustsFontSizeToFit
+            minimumFontScale={0.75}
+          >
+            {q.prompt}
+          </Text>
+          <Text style={[styles.message, responsiveStyles.message]}>
+            {message}
+          </Text>
+        </View>
 
-      <View style={[styles.lifelines, responsiveStyles.lifelines]}>
-        <LifelineButton
-          emoji="🎲"
-          label="50/50"
-          count={lifelines.fifty}
-          onPress={useFifty}
-        />
-        <LifelineButton
-          emoji="⏭️"
-          label="Skip"
-          count={lifelines.skip}
-          onPress={useSkip}
-        />
-        <LifelineButton
-          emoji="⏱️"
-          label="+5s"
-          count={lifelines.time}
-          onPress={useTime}
-        />
-      </View>
+        <View style={[styles.options, responsiveStyles.options]}>
+          {Array.from({ length: Math.ceil(q.options.length / 2) }, (_, row) => (
+            <View key={row} style={responsiveStyles.optionRow}>
+              {q.options.slice(row * 2, row * 2 + 2).map((o, col) => {
+                const i = row * 2 + col;
+                return (
+                  <OptionButton
+                    key={`${q.id}-${i}`}
+                    width={optionWidth}
+                    letter={LETTERS[i]}
+                    label={o}
+                    state={optionState(i)}
+                    onPress={() => onAnswer(i)}
+                  />
+                );
+              })}
+            </View>
+          ))}
+        </View>
 
-      {finished && (
-        <ResultModal
-          kind={correctCount >= 6 ? "win" : "lose"}
-          title={correctCount >= 6 ? "Brilliant! 🎉" : "Nice try!"}
-          subtitle={`${correctCount}/${QUESTIONS} correct · Score ${score}`}
-          onPlayAgain={restart}
-          onExit={() => router.back()}
-          stars={stars}
-        />
-      )}
-    </GameScreen>
+        <View style={[styles.lifelines, responsiveStyles.lifelines]}>
+          <LifelineButton
+            emoji="🎲"
+            label="50/50"
+            count={lifelines.fifty}
+            onPress={useFifty}
+          />
+          <LifelineButton
+            emoji="⏭️"
+            label="Skip"
+            count={lifelines.skip}
+            onPress={useSkip}
+          />
+          <LifelineButton
+            emoji="⏱️"
+            label="+5s"
+            count={lifelines.time}
+            onPress={useTime}
+          />
+        </View>
+
+        {finished && (
+          <ResultModal
+            kind={correctCount >= 6 ? "win" : "lose"}
+            title={correctCount >= 6 ? "Brilliant! 🎉" : "Nice try!"}
+            subtitle={`${correctCount}/${QUESTIONS} correct · Score ${score}`}
+            onPlayAgain={restart}
+            onExit={() => router.back()}
+            stars={stars}
+          />
+        )}
+      </GameScreen>
+      <HowToPlayOverlay id="quiz" visible={help.visible} onClose={help.close} />
+    </>
   );
 }
 
