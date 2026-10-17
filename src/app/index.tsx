@@ -1,6 +1,7 @@
 import { AnimatedBackground, GameCard, StatChip } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
 import { games } from "@/core/data/games";
+import { learnModules } from "@/core/data/learn";
 import { selectTotalStars, useProgress } from "@/core/store/progress";
 import { colors, radius, spacing, typography } from "@/core/theme";
 import { Href, router } from "expo-router";
@@ -25,6 +26,23 @@ export default function Home() {
               value={`🔥 ${streak} ${streak === 1 ? "day" : "days"}`}
             />
           </View>
+          <Text style={styles.sectionHeading}>📚 Learn</Text>
+          <View style={styles.grid}>
+            {learnModules.map((module, i) => (
+              <GameCard
+                key={module.id}
+                title={module.title}
+                emoji={module.emoji}
+                gradient={module.gradient}
+                locked={!module.ready}
+                index={i}
+                onPress={() =>
+                  module.ready && router.push(module.route as Href)
+                }
+              />
+            ))}
+          </View>
+          <Text style={styles.sectionHeading}>🎮 Games</Text>
           <View style={styles.grid}>
             {games.map((g, i) => (
               <GameCard
@@ -68,6 +86,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
   },
   settingsIcon: { ...typography.heading, color: colors.text },
+  sectionHeading: {
+    ...typography.heading,
+    color: colors.text,
+    textAlign: "left",
+    marginBottom: spacing.md,
+  },
   title: {
     ...typography.title,
     color: colors.text,

@@ -4,6 +4,7 @@ import {
     type AudioPlayer,
 } from "expo-audio";
 import * as Haptics from "expo-haptics";
+import * as Speech from "expo-speech";
 
 import { useSettings } from "@/core/store/settings";
 
@@ -37,6 +38,26 @@ export function playSound(name: SoundName): void {
     void playSoundSafely(name);
   } catch {
     // Sound feedback must never interrupt gameplay.
+  }
+}
+
+export function speak(text: string): void {
+  try {
+    if (!useSettings.getState().soundOn) {
+      return;
+    }
+
+    void Speech.stop()
+      .catch(() => undefined)
+      .finally(() => {
+        try {
+          Speech.speak(text, { language: "en-US", rate: 0.8, pitch: 1.1 });
+        } catch {
+          // Speech feedback must never interrupt gameplay.
+        }
+      });
+  } catch {
+    // Speech feedback must never interrupt gameplay.
   }
 }
 
