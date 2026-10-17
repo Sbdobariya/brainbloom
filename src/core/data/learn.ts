@@ -24,7 +24,7 @@ export const learnModules: LearnModule[] = [
     emoji: "🔢",
     route: "/learn/numbers",
     gradient: gradients.warm,
-    ready: false,
+    ready: true,
   },
   {
     id: "shapes",
