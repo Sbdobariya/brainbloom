@@ -1,4 +1,8 @@
-import { AnimatedBackground, GameCard } from "@/core/components";
+import {
+  AnimatedBackground,
+  GameCard,
+  renderGameIcon,
+} from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
 import { games } from "@/core/data/games";
 import { learnModules } from "@/core/data/learn";
@@ -138,15 +142,24 @@ export default function ExploreScreen() {
                 <View key={rowIndex} style={responsiveStyles.gridRow}>
                   {row.map((entry, columnIndex) => {
                     const index = rowIndex * columns + columnIndex;
+                    const isLevelGame =
+                      entry.id === "freeFlow" || entry.id === "waterSort";
+                    const gameEntry = entry as (typeof games)[number];
+                    // TODO: show "N levels done" for level-based games later.
                     return (
                       <GameCard
                         key={entry.id}
                         title={entry.title}
                         emoji={entry.emoji}
+                        icon={
+                          selectedTab === "games"
+                            ? renderGameIcon(gameEntry.icon, s(56))
+                            : undefined
+                        }
                         gradient={entry.gradient}
                         category={entry.category}
                         subtitle={entry.subtitle}
-                        stars={stars[entry.id] ?? 0}
+                        stars={isLevelGame ? 0 : (stars[entry.id] ?? 0)}
                         locked={!entry.ready}
                         index={index}
                         width={cardWidth}

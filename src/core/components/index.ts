@@ -1,12 +1,15 @@
 export { AnimatedBackground } from "./AnimatedBackground";
 export * from "./AnimatedSplash";
 export { ChoiceTile } from "./ChoiceTile";
+export * from "./FlowIcon";
 export * from "./GameCard";
 export { GameHeader } from "./GameHeader";
+export * from "./gameIcons";
 export { GameScreen } from "./GameScreen";
 export * from "./GameTabBar";
 export { GradientButton } from "./GradientButton";
 export * from "./HowToPlayOverlay";
+export * from "./LevelSelect";
 export * from "./ParentalGate";
 export { PressableScale } from "./PressableScale";
 export * from "./ResultModal";

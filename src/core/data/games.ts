@@ -4,6 +4,7 @@ export type GameInfo = {
   id: string;
   title: string;
   emoji: string;
+  icon?: "flow";
   category: string;
   subtitle: string;
   route: string;
@@ -66,6 +67,7 @@ export const games: GameInfo[] = [
     id: "freeFlow",
     title: "Free Flow",
     emoji: "🌊",
+    icon: "flow",
     category: "LOGIC",
     subtitle: "Connect the colors",
     route: "/games/free-flow",

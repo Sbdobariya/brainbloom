@@ -32,6 +32,7 @@ function lighten(hex: string, amount: number) {
 type Props = {
   title: string;
   emoji: string;
+  icon?: React.ReactNode;
   gradient: readonly [string, string];
   category?: string;
   subtitle?: string;
@@ -45,6 +46,7 @@ type Props = {
 export function GameCard({
   title,
   emoji,
+  icon,
   gradient,
   category,
   subtitle,
@@ -221,15 +223,17 @@ export function GameCard({
               },
             ]}
           >
-            <Text
-              style={[
-                styles.emoji,
-                responsiveStyles.emoji,
-                isLocked && styles.lockedEmoji,
-              ]}
-            >
-              {emoji}
-            </Text>
+            {icon ?? (
+              <Text
+                style={[
+                  styles.emoji,
+                  responsiveStyles.emoji,
+                  isLocked && styles.lockedEmoji,
+                ]}
+              >
+                {emoji}
+              </Text>
+            )}
           </View>
           <Text
             numberOfLines={2}

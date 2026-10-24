@@ -11,7 +11,9 @@ type Props = {
   title: string;
   subtitle?: string;
   right?: ReactNode;
+  onBack?: () => void;
   onHelp?: () => void;
+  scrollable?: boolean;
   children: ReactNode;
 };
 
@@ -19,10 +21,28 @@ export function GameScreen({
   title,
   subtitle,
   right,
+  onBack,
   onHelp,
+  scrollable = true,
   children,
 }: Props) {
   const { contentWidth, padding } = useResponsive();
+
+  const content = (
+    <View
+      style={[
+        styles.content,
+        {
+          maxWidth: contentWidth,
+          width: "100%",
+          alignSelf: "center",
+          paddingHorizontal: padding,
+        },
+      ]}
+    >
+      {children}
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -30,26 +50,18 @@ export function GameScreen({
         <GameHeader
           title={title}
           subtitle={subtitle}
-          onBack={() => router.back()}
+          onBack={onBack ?? (() => router.back())}
           right={right}
           onHelp={onHelp}
         />
       </View>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View
-          style={[
-            styles.content,
-            {
-              maxWidth: contentWidth,
-              width: "100%",
-              alignSelf: "center",
-              paddingHorizontal: padding,
-            },
-          ]}
-        >
-          {children}
-        </View>
-      </ScrollView>
+      {scrollable ? (
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {content}
+        </ScrollView>
+      ) : (
+        content
+      )}
     </SafeAreaView>
   );
 }
