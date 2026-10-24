@@ -1,5 +1,6 @@
 import { PressableScale } from "@/core/components/PressableScale";
-import { colors, radius } from "@/core/theme";
+import { colors, radius, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { LinearGradient } from "expo-linear-gradient";
 import { useEffect } from "react";
 import { StyleSheet, Text } from "react-native";
@@ -35,9 +36,15 @@ export function PuzzleTile({
   hinted,
   onPress,
 }: Props) {
+  const { s } = useResponsive();
   const step = tileSize + gap;
   const col = index % size;
   const row = Math.floor(index / size);
+  const responsiveStyles = StyleSheet.create({
+    fill: { borderRadius: s(radius.lg) },
+    hinted: { borderWidth: s(3) },
+    badge: { right: s(10), bottom: s(6), fontSize: s(14) },
+  });
 
   // Start exactly where the tile belongs so it doesn't fly in from (0,0)
   const x = useSharedValue(col * step);
@@ -96,12 +103,17 @@ export function PuzzleTile({
           colors={gradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={[styles.fill, hinted && styles.hinted]}
+          style={[
+            styles.fill,
+            responsiveStyles.fill,
+            hinted && styles.hinted,
+            hinted && responsiveStyles.hinted,
+          ]}
         >
           <Text style={[styles.emoji, { fontSize: tileSize * 0.45 }]}>
             {emoji}
           </Text>
-          <Text style={styles.badge}>{value}</Text>
+          <Text style={[styles.badge, responsiveStyles.badge]}>{value}</Text>
         </LinearGradient>
       </PressableScale>
     </Animated.View>
@@ -113,18 +125,14 @@ const styles = StyleSheet.create({
   pressable: { flex: 1 },
   fill: {
     flex: 1,
-    borderRadius: radius.lg,
     alignItems: "center",
     justifyContent: "center",
   },
-  hinted: { borderWidth: 3, borderColor: colors.text },
+  hinted: { borderColor: colors.text },
   emoji: { textAlign: "center" },
   badge: {
+    ...typography.caption,
     position: "absolute",
-    right: 10,
-    bottom: 6,
-    fontSize: 14,
-    fontWeight: "800",
     color: "rgba(255,255,255,0.85)",
   },
 });

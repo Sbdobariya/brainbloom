@@ -1,4 +1,4 @@
-package com.brainbloom
+package app.brainbloom.kids
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

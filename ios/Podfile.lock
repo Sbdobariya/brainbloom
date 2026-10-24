@@ -93,7 +93,7 @@ PODS:
     - RNScreens
   - ExpoSpeech (57.0.3):
     - ExpoModulesCore
-  - ExpoSplashScreen (57.0.9):
+  - ExpoSplashScreen (57.0.10):
     - ExpoModulesCore
   - ExpoSymbols (57.0.3):
     - ExpoModulesCore
@@ -2724,7 +2724,7 @@ SPEC CHECKSUMS:
   ExpoModulesWorkletsAdapter: 85697593f57f6fd1375621d545c596dcd59dac1f
   ExpoRouter: 72006aae54ac9e2b17b7211214fe3c7c29a39e97
   ExpoSpeech: ab83f97ede99c65a23fd4c228122deadc430de01
-  ExpoSplashScreen: e771da4f26d550ea4fd067d8fb942657e47bb846
+  ExpoSplashScreen: 856060f5724dc4fca4d69a2d18a161e3baa37019
   ExpoSymbols: 37a3a6e5847edb08b83a5ee04d3b46525e205f00
   ExpoSystemUI: 05ee8d4aaba1b6af330f3621e19b39ff9f21e718
   ExpoUI: 04f60b7b9789e2cdc337747546b892e3dd8c17d6
@@ -2817,6 +2817,6 @@ SPEC CHECKSUMS:
   RNWorklets: 43af89f696342f91118a2f1f3a879056e2f47331
   Yoga: 18b74b3ade30bebc1904004dfaceae1dd02a330a
 
-PODFILE CHECKSUM: a8df1acd000bd00eccc315da3126bf958864a076
+PODFILE CHECKSUM: 02f655cae1b4c07ce0c49d33c25013237fba8351
 
 COCOAPODS: 1.17.0

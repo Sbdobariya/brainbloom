@@ -1,7 +1,9 @@
 import { playSound, speak } from "@/core/audio/feedback";
-import { GameScreen } from "@/core/components";
+import { GameScreen, HowToPlayOverlay } from "@/core/components";
 import { PressableScale } from "@/core/components/PressableScale";
+import { useHowToPlay } from "@/core/howToPlay/useHowToPlay";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -24,24 +26,44 @@ const SHAPE_COLORS = [
   colors.teal,
   colors.red,
 ];
-const SHAPE_SIZE = 190;
-
 const sayIt = (item: ShapeItem) => speak(`${item.name}. ${item.fact}`);
 
-type CardProps = { item: ShapeItem; color: string; dir: 1 | -1 };
+type CardProps = {
+  item: ShapeItem;
+  color: string;
+  dir: 1 | -1;
+  audioEnabled: boolean;
+};
 
 // Re-created (via key) for every shape: slides in and speaks on mount
-function ShapeCard({ item, color, dir }: CardProps) {
+function ShapeCard({ item, color, dir, audioEnabled }: CardProps) {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    card: {
+      gap: s(spacing.sm),
+      paddingVertical: s(spacing.xl),
+      paddingHorizontal: s(spacing.lg),
+      borderWidth: s(3),
+      borderRadius: s(radius.lg),
+    },
+    name: { fontSize: s(40) },
+    fact: { fontSize: s(typography.body.fontSize) },
+    tapHint: {
+      fontSize: s(typography.caption.fontSize),
+      marginTop: s(spacing.xs),
+    },
+  });
   const x = useSharedValue(dir * 90);
   const opacity = useSharedValue(0);
   const wobble = useSharedValue(0);
   const scale = useSharedValue(1);
+  const shapeSize = Math.max(120, s(190));
 
   useEffect(() => {
     x.value = withSpring(0, { damping: 16, stiffness: 180 });
     opacity.value = withTiming(1, { duration: 220 });
-    sayIt(item);
-  }, [item, x, opacity]);
+    if (audioEnabled) sayIt(item);
+  }, [item, x, opacity, audioEnabled]);
 
   const cardStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -67,20 +89,57 @@ function ShapeCard({ item, color, dir }: CardProps) {
   };
 
   return (
-    <Animated.View style={[styles.card, { borderColor: color }, cardStyle]}>
+    <Animated.View
+      style={[
+        styles.card,
+        responsiveStyles.card,
+        { borderColor: color },
+        cardStyle,
+      ]}
+    >
       <PressableScale onPress={onTapShape} haptic={false} scaleTo={0.92}>
         <Animated.View style={shapeStyle}>
-          <ShapeView id={item.id} size={SHAPE_SIZE} color={color} />
+          <ShapeView id={item.id} size={shapeSize} color={color} />
         </Animated.View>
       </PressableScale>
-      <Text style={[styles.name, { color }]}>{item.name}</Text>
-      <Text style={styles.fact}>{item.fact}</Text>
-      <Text style={styles.tapHint}>Tap the shape to hear it again 🔊</Text>
+      <Text
+        style={[styles.name, responsiveStyles.name, { color }]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
+        {item.name}
+      </Text>
+      <Text style={[styles.fact, responsiveStyles.fact]}>{item.fact}</Text>
+      <Text style={[styles.tapHint, responsiveStyles.tapHint]}>
+        Tap the shape to hear it again 🔊
+      </Text>
     </Animated.View>
   );
 }
 
 export function ShapesScreen() {
+  const help = useHowToPlay("shapes");
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    progress: {
+      marginTop: s(spacing.lg),
+      fontSize: s(typography.caption.fontSize),
+    },
+    nav: { paddingBottom: s(spacing.xl) },
+    navButton: {
+      width: Math.max(56, s(72)),
+      height: Math.max(56, s(72)),
+      borderWidth: s(2),
+      borderRadius: s(radius.pill),
+    },
+    speaker: {
+      width: Math.max(56, s(88)),
+      height: Math.max(56, s(88)),
+      borderRadius: s(radius.pill),
+    },
+    navText: { fontSize: s(26) },
+    speakerText: { fontSize: s(38) },
+  });
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<1 | -1>(1);
 
@@ -96,46 +155,70 @@ export function ShapesScreen() {
   };
 
   return (
-    <GameScreen title="🔷 Shapes" subtitle="Learn the shapes">
-      <Text style={styles.progress}>
-        {index + 1} / {shapes.length}
-      </Text>
+    <>
+      <GameScreen
+        title="🔷 Shapes"
+        subtitle="Learn the shapes"
+        onHelp={help.open}
+      >
+        <Text style={[styles.progress, responsiveStyles.progress]}>
+          {index + 1} / {shapes.length}
+        </Text>
 
-      <View style={styles.stage}>
-        <ShapeCard key={index} item={item} color={color} dir={dir} />
-      </View>
+        <View style={styles.stage}>
+          <ShapeCard
+            key={index}
+            item={item}
+            color={color}
+            dir={dir}
+            audioEnabled={!help.visible}
+          />
+        </View>
 
-      <View style={styles.nav}>
-        <PressableScale
-          style={[styles.navButton, index === 0 && styles.navDisabled]}
-          disabled={index === 0}
-          haptic={false}
-          onPress={() => go(-1)}
-        >
-          <Text style={styles.navText}>◀</Text>
-        </PressableScale>
+        <View style={[styles.nav, responsiveStyles.nav]}>
+          <PressableScale
+            style={[
+              styles.navButton,
+              responsiveStyles.navButton,
+              index === 0 && styles.navDisabled,
+            ]}
+            disabled={index === 0}
+            haptic={false}
+            onPress={() => go(-1)}
+          >
+            <Text style={[styles.navText, responsiveStyles.navText]}>◀</Text>
+          </PressableScale>
 
-        <PressableScale
-          style={styles.speaker}
-          haptic={false}
-          onPress={() => sayIt(item)}
-        >
-          <Text style={styles.speakerText}>🔊</Text>
-        </PressableScale>
+          <PressableScale
+            style={[styles.speaker, responsiveStyles.speaker]}
+            haptic={false}
+            onPress={() => sayIt(item)}
+          >
+            <Text style={[styles.speakerText, responsiveStyles.speakerText]}>
+              🔊
+            </Text>
+          </PressableScale>
 
-        <PressableScale
-          style={[
-            styles.navButton,
-            index === shapes.length - 1 && styles.navDisabled,
-          ]}
-          disabled={index === shapes.length - 1}
-          haptic={false}
-          onPress={() => go(1)}
-        >
-          <Text style={styles.navText}>▶</Text>
-        </PressableScale>
-      </View>
-    </GameScreen>
+          <PressableScale
+            style={[
+              styles.navButton,
+              responsiveStyles.navButton,
+              index === shapes.length - 1 && styles.navDisabled,
+            ]}
+            disabled={index === shapes.length - 1}
+            haptic={false}
+            onPress={() => go(1)}
+          >
+            <Text style={[styles.navText, responsiveStyles.navText]}>▶</Text>
+          </PressableScale>
+        </View>
+      </GameScreen>
+      <HowToPlayOverlay
+        id="shapes"
+        visible={help.visible}
+        onClose={help.close}
+      />
+    </>
   );
 }
 
@@ -144,50 +227,35 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
     textAlign: "center",
-    marginTop: spacing.lg,
   },
-  stage: { flex: 1, justifyContent: "center", overflow: "hidden" },
+  stage: { flex: 1, justifyContent: "center" },
   card: {
     alignItems: "center",
-    gap: spacing.sm,
-    paddingVertical: spacing.xl,
-    paddingHorizontal: spacing.lg,
     backgroundColor: colors.card,
-    borderWidth: 3,
-    borderRadius: radius.lg,
   },
-  name: { ...typography.title, fontSize: 40 },
+  name: { ...typography.title },
   fact: { ...typography.body, color: colors.text, textAlign: "center" },
   tapHint: {
     ...typography.caption,
     color: colors.textMuted,
-    marginTop: spacing.xs,
   },
   nav: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingBottom: spacing.xl,
   },
   navButton: {
-    width: 72,
-    height: 72,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 2,
-    borderRadius: radius.pill,
   },
   navDisabled: { opacity: 0.3 },
-  navText: { color: colors.text, fontSize: 26 },
+  navText: { color: colors.text },
   speaker: {
-    width: 88,
-    height: 88,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.purple,
-    borderRadius: radius.pill,
   },
-  speakerText: { fontSize: 38 },
+  speakerText: {},
 });

@@ -1,4 +1,5 @@
 import { colors } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import {
   Canvas,
   Circle,
@@ -7,7 +8,7 @@ import {
   Skia,
 } from "@shopify/react-native-skia";
 import React, { useMemo, useRef } from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import type { Level, Paths } from "../logic/freeFlow";
 
@@ -31,7 +32,13 @@ export function FreeFlowBoard({
   onEnd,
 }: Props) {
   const { size, pairs } = level;
-  const cell = boardPx / size;
+  const { s } = useResponsive();
+  const gridInset = s(2);
+  const gridRadius = s(10);
+  const cell = Math.floor(boardPx / size);
+  const responsiveStyles = StyleSheet.create({
+    board: { width: boardPx, height: boardPx },
+  });
 
   // The gesture is created once. It calls the latest handlers through a ref,
   // so a re-render in the middle of a drag never uses stale state or resets it.
@@ -82,17 +89,17 @@ export function FreeFlowBoard({
 
   return (
     <GestureDetector gesture={pan}>
-      <View style={{ width: boardPx, height: boardPx }}>
-        <Canvas style={{ width: boardPx, height: boardPx }}>
+      <View style={responsiveStyles.board}>
+        <Canvas style={responsiveStyles.board}>
           {/* Grid cells */}
           {Array.from({ length: size * size }, (_, i) => (
             <RoundedRect
               key={i}
-              x={(i % size) * cell + 2}
-              y={Math.floor(i / size) * cell + 2}
-              width={cell - 4}
-              height={cell - 4}
-              r={10}
+              x={(i % size) * cell + gridInset}
+              y={Math.floor(i / size) * cell + gridInset}
+              width={cell - gridInset * 2}
+              height={cell - gridInset * 2}
+              r={gridRadius}
               color={colors.bgSoft}
             />
           ))}

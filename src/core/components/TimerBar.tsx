@@ -1,4 +1,5 @@
 import { colors, radius, spacing } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, {
@@ -12,6 +13,11 @@ import Animated, {
 type Props = { progress: number };
 
 export function TimerBar({ progress }: Props) {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    track: { height: s(spacing.md), borderRadius: s(radius.pill) },
+    fill: { borderRadius: s(radius.pill) },
+  });
   const value = useSharedValue(progress);
 
   useEffect(() => {
@@ -31,18 +37,16 @@ export function TimerBar({ progress }: Props) {
   }));
 
   return (
-    <View style={styles.track}>
-      <Animated.View style={[styles.fill, fillStyle]} />
+    <View style={[styles.track, responsiveStyles.track]}>
+      <Animated.View style={[styles.fill, responsiveStyles.fill, fillStyle]} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   track: {
-    height: spacing.md,
     backgroundColor: colors.card,
-    borderRadius: radius.pill,
     overflow: "hidden",
   },
-  fill: { height: "100%", borderRadius: radius.pill },
+  fill: { height: "100%" },
 });

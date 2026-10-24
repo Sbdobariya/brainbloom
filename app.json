@@ -8,18 +8,19 @@
     "scheme": "brainbloom",
     "userInterfaceStyle": "dark",
     "ios": {
-      "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.brainbloom"
+      "bundleIdentifier": "app.brainbloom.kids",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0B0F2A",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "backgroundColor": "#1B2260",
+        "foregroundImage": "./assets/images/android-icon-foreground.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.brainbloom",
+      "package": "app.brainbloom.kids",
       "blockedPermissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
@@ -31,9 +32,9 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#0B0F2A",
+          "backgroundColor": "#0F1538",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 200
         }
       ],
       [
@@ -49,7 +50,8 @@
             "enableSceneSupport": true
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,

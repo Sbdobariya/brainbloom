@@ -6,21 +6,50 @@ import { useGate } from "@/core/store/gate";
 import { useProgress } from "@/core/store/progress";
 import { useSettings } from "@/core/store/settings";
 import { colors, MIN_TOUCH, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import * as WebBrowser from "expo-web-browser";
 import { Alert, StyleSheet, Text, View } from "react-native";
 
 export default function Settings() {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    rows: { gap: s(spacing.md) },
+    row: {
+      minHeight: Math.max(MIN_TOUCH, s(MIN_TOUCH)),
+      gap: s(spacing.md),
+      padding: s(spacing.md),
+      borderRadius: s(radius.lg),
+    },
+    emoji: { fontSize: s(typography.heading.fontSize) },
+    label: { fontSize: s(typography.body.fontSize) },
+    note: {
+      marginTop: s(spacing.lg),
+      fontSize: s(typography.caption.fontSize),
+    },
+    sectionHeading: {
+      marginTop: s(spacing.xl),
+      marginBottom: s(spacing.md),
+      fontSize: s(typography.heading.fontSize),
+    },
+  });
   const soundOn = useSettings((state) => state.soundOn);
   const hapticsOn = useSettings((state) => state.hapticsOn);
   const setSoundOn = useSettings((state) => state.setSoundOn);
   const setHapticsOn = useSettings((state) => state.setHapticsOn);
+  const resetSeenHowTo = useProgress((state) => state.resetSeenHowTo);
 
   return (
     <GameScreen title="Settings">
-      <View style={styles.rows}>
-        <View style={styles.row}>
-          <Text style={styles.emoji}>🔊</Text>
-          <Text style={styles.label}>Sound</Text>
+      <View style={[styles.rows, responsiveStyles.rows]}>
+        <View style={[styles.row, responsiveStyles.row]}>
+          <Text style={[styles.emoji, responsiveStyles.emoji]}>🔊</Text>
+          <Text
+            style={[styles.label, responsiveStyles.label]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            Sound
+          </Text>
           <ToggleSwitch
             value={soundOn}
             onChange={(enabled) => {
@@ -29,30 +58,62 @@ export default function Settings() {
             }}
           />
         </View>
-        <View style={styles.row}>
-          <Text style={styles.emoji}>📳</Text>
-          <Text style={styles.label}>Vibration</Text>
+        <View style={[styles.row, responsiveStyles.row]}>
+          <Text style={[styles.emoji, responsiveStyles.emoji]}>📳</Text>
+          <Text
+            style={[styles.label, responsiveStyles.label]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            Vibration
+          </Text>
           <ToggleSwitch value={hapticsOn} onChange={setHapticsOn} />
         </View>
+        <PressableScale
+          style={[styles.row, responsiveStyles.row]}
+          haptic={false}
+          onPress={resetSeenHowTo}
+        >
+          <Text style={[styles.emoji, responsiveStyles.emoji]}>💡</Text>
+          <Text
+            style={[styles.label, responsiveStyles.label]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            Show tips again
+          </Text>
+        </PressableScale>
       </View>
-      <Text style={styles.note}>
+      <Text style={[styles.note, responsiveStyles.note]}>
         BrainBloom stores your stars on this device only.
       </Text>
-      <Text style={styles.sectionHeading}>🔒 For parents</Text>
-      <View style={styles.rows}>
+      <Text
+        style={[styles.sectionHeading, responsiveStyles.sectionHeading]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+      >
+        🔒 For parents
+      </Text>
+      <View style={[styles.rows, responsiveStyles.rows]}>
         <PressableScale
-          style={styles.row}
+          style={[styles.row, responsiveStyles.row]}
           onPress={() =>
             useGate
               .getState()
               .request(() => WebBrowser.openBrowserAsync(PRIVACY_URL))
           }
         >
-          <Text style={styles.emoji}>🔒</Text>
-          <Text style={styles.label}>Privacy policy</Text>
+          <Text style={[styles.emoji, responsiveStyles.emoji]}>🔒</Text>
+          <Text
+            style={[styles.label, responsiveStyles.label]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            Privacy policy
+          </Text>
         </PressableScale>
         <PressableScale
-          style={styles.row}
+          style={[styles.row, responsiveStyles.row]}
           onPress={() =>
             useGate.getState().request(() =>
               Alert.alert(
@@ -70,8 +131,14 @@ export default function Settings() {
             )
           }
         >
-          <Text style={styles.emoji}>🗑️</Text>
-          <Text style={styles.label}>Reset progress</Text>
+          <Text style={[styles.emoji, responsiveStyles.emoji]}>🗑️</Text>
+          <Text
+            style={[styles.label, responsiveStyles.label]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+          >
+            Reset progress
+          </Text>
         </PressableScale>
       </View>
     </GameScreen>
@@ -79,23 +146,15 @@ export default function Settings() {
 }
 
 const styles = StyleSheet.create({
-  rows: {
-    gap: spacing.md,
-  },
+  rows: {},
   row: {
-    minHeight: MIN_TOUCH,
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.md,
-    padding: spacing.md,
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
     borderWidth: 1,
-    borderRadius: radius.lg,
   },
-  emoji: {
-    ...typography.heading,
-  },
+  emoji: { ...typography.heading },
   label: {
     ...typography.body,
     color: colors.text,
@@ -104,13 +163,10 @@ const styles = StyleSheet.create({
   note: {
     ...typography.caption,
     color: colors.textMuted,
-    marginTop: spacing.lg,
     textAlign: "center",
   },
   sectionHeading: {
     ...typography.heading,
     color: colors.text,
-    marginTop: spacing.xl,
-    marginBottom: spacing.md,
   },
 });

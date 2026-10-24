@@ -8,6 +8,7 @@ import {
   colors as themeColors,
   typography,
 } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { PressableScale } from "./PressableScale";
 
 type Props = {
@@ -23,20 +24,45 @@ export function GradientButton({
   colors = gradients.warm,
   disabled = false,
 }: Props) {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    button: {
+      minHeight: Math.max(MIN_TOUCH, s(MIN_TOUCH)),
+      borderRadius: s(radius.lg),
+    },
+    gradient: {
+      minHeight: Math.max(MIN_TOUCH, s(MIN_TOUCH)),
+      paddingHorizontal: s(MIN_TOUCH),
+      borderRadius: s(radius.lg),
+    },
+    label: { fontSize: s(typography.heading.fontSize) },
+  });
+
   return (
     <PressableScale
       disabled={disabled}
       onPress={onPress}
       sound
-      style={[styles.button, disabled && styles.disabled]}
+      style={[
+        styles.button,
+        responsiveStyles.button,
+        disabled && styles.disabled,
+      ]}
     >
       <LinearGradient
         colors={colors}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
-        style={styles.gradient}
+        style={[styles.gradient, responsiveStyles.gradient]}
       >
-        <Text style={styles.label}>{label}</Text>
+        <Text
+          style={[styles.label, responsiveStyles.label]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+        >
+          {label}
+        </Text>
       </LinearGradient>
     </PressableScale>
   );
@@ -44,8 +70,6 @@ export function GradientButton({
 
 const styles = StyleSheet.create({
   button: {
-    minHeight: MIN_TOUCH,
-    borderRadius: radius.lg,
     overflow: "hidden",
   },
   disabled: {
@@ -53,11 +77,8 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
-    minHeight: MIN_TOUCH,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: MIN_TOUCH,
-    borderRadius: radius.lg,
   },
   label: {
     ...typography.heading,

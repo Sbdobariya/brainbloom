@@ -1,4 +1,4 @@
-package com.brainbloom
+package app.brainbloom.kids
 
 import android.app.Application
 import android.content.res.Configuration

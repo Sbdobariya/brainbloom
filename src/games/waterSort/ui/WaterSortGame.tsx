@@ -2,12 +2,15 @@ import { haptic, playSound } from "@/core/audio/feedback";
 import {
   GameScreen,
   GradientButton,
+  HowToPlayOverlay,
   ResultModal,
   StatChip,
 } from "@/core/components";
+import { useHowToPlay } from "@/core/howToPlay/useHowToPlay";
 import { starsForMoves } from "@/core/logic/stars";
 import { useProgress } from "@/core/store/progress";
 import { colors, gradients, spacing } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -34,10 +37,19 @@ const PALETTE = [
   colors.teal,
 ];
 
-const TUBE_W = 56;
-const TUBE_H = 190;
-
 export function WaterSortGame() {
+  const help = useHowToPlay("waterSort");
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    row: { gap: s(spacing.sm), marginTop: s(spacing.lg) },
+    tubes: {
+      columnGap: s(spacing.lg),
+      rowGap: s(spacing.xl),
+      marginTop: s(spacing.xxl),
+      paddingTop: s(spacing.lg),
+    },
+    footer: { paddingBottom: s(spacing.xl) },
+  });
   const [level, setLevel] = useState(1);
   const [tubes, setTubes] = useState<Tube[]>(() => createLevel(1));
   const [history, setHistory] = useState<Tube[][]>([]);
@@ -130,75 +142,85 @@ export function WaterSortGame() {
     setSelected(null);
   };
 
+  const tubeWidth = Math.max(48, s(56));
+  const tubeHeight = Math.max(120, s(190));
+
   return (
-    <GameScreen
-      title="Water Sort"
-      subtitle={`Level ${level} · Sort ${colorCount} colors!`}
-    >
-      <View style={styles.row}>
-        <StatChip label="MOVES" value={moves} color={colors.blue} />
-        <StatChip
-          label="SOLVED"
-          value={`${solvedCount(tubes)}/${colorCount}`}
-          color={colors.green}
-        />
-        <StatChip label="LEVEL" value={level} color={colors.yellow} />
-      </View>
-
-      <View style={styles.tubes}>
-        {tubes.map((tube, i) => (
-          <LiquidTube
-            key={i}
-            layers={tube.map((c) => PALETTE[c % PALETTE.length])}
-            selected={selected === i}
-            width={TUBE_W}
-            height={TUBE_H}
-            onPress={() => onTubePress(i)}
+    <>
+      <GameScreen
+        title="Water Sort"
+        subtitle={`Level ${level} · Sort ${colorCount} colors!`}
+        onHelp={help.open}
+      >
+        <View style={[styles.row, responsiveStyles.row]}>
+          <StatChip label="MOVES" value={moves} color={colors.blue} />
+          <StatChip
+            label="SOLVED"
+            value={`${solvedCount(tubes)}/${colorCount}`}
+            color={colors.green}
           />
-        ))}
-      </View>
+          <StatChip label="LEVEL" value={level} color={colors.yellow} />
+        </View>
 
-      <View style={styles.footer}>
-        <View style={styles.row}>
-          <View style={styles.flex}>
-            <GradientButton
-              label="↩️ Undo"
-              colors={gradients.cool}
-              onPress={undo}
+        <View style={[styles.tubes, responsiveStyles.tubes]}>
+          {tubes.map((tube, i) => (
+            <LiquidTube
+              key={i}
+              layers={tube.map((c) => PALETTE[c % PALETTE.length])}
+              selected={selected === i}
+              width={tubeWidth}
+              height={tubeHeight}
+              onPress={() => onTubePress(i)}
             />
-          </View>
-          <View style={styles.flex}>
-            <GradientButton label="🔄 Reset" onPress={() => loadLevel(level)} />
+          ))}
+        </View>
+
+        <View style={[styles.footer, responsiveStyles.footer]}>
+          <View style={[styles.row, responsiveStyles.row]}>
+            <View style={styles.flex}>
+              <GradientButton
+                label="↩️ Undo"
+                colors={gradients.cool}
+                onPress={undo}
+              />
+            </View>
+            <View style={styles.flex}>
+              <GradientButton
+                label="🔄 Reset"
+                onPress={() => loadLevel(level)}
+              />
+            </View>
           </View>
         </View>
-      </View>
 
-      {showResult && (
-        <ResultModal
-          kind="win"
-          title="Level complete! 🎉"
-          subtitle={`${moves} moves`}
-          playAgainLabel="Next level"
-          onPlayAgain={() => loadLevel(level + 1)}
-          onExit={() => router.back()}
-          stars={stars}
-        />
-      )}
-    </GameScreen>
+        {showResult && (
+          <ResultModal
+            kind="win"
+            title="Level complete! 🎉"
+            subtitle={`${moves} moves`}
+            playAgainLabel="Next level"
+            onPlayAgain={() => loadLevel(level + 1)}
+            onExit={() => router.back()}
+            stars={stars}
+          />
+        )}
+      </GameScreen>
+      <HowToPlayOverlay
+        id="waterSort"
+        visible={help.visible}
+        onClose={help.close}
+      />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: spacing.sm, marginTop: spacing.lg },
+  row: { flexDirection: "row" },
   flex: { flex: 1 },
   tubes: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    columnGap: spacing.lg,
-    rowGap: spacing.xl,
-    marginTop: spacing.xxl,
-    paddingTop: spacing.lg,
   },
-  footer: { flex: 1, justifyContent: "flex-end", paddingBottom: spacing.xl },
+  footer: { flex: 1, justifyContent: "flex-end" },
 });

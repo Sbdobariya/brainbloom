@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.brainbloom'
+    namespace 'app.brainbloom.kids'
     defaultConfig {
-        applicationId 'com.brainbloom'
+        applicationId 'app.brainbloom.kids'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

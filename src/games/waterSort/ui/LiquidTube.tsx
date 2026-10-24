@@ -1,5 +1,6 @@
 import { PressableScale } from "@/core/components/PressableScale";
-import { colors } from "@/core/theme";
+import { colors, radius } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import {
   Canvas,
   Group,
@@ -20,18 +21,17 @@ import Animated, {
 } from "react-native-reanimated";
 import { CAPACITY } from "../logic/waterSort";
 
-const PAD = 6;
-
 type SlotProps = {
   index: number; // 0 = bottom slot
   color: string | null; // null = empty slot
   slotH: number;
   width: number;
   height: number;
+  pad: number;
 };
 
 // One layer of liquid. Hooks work inside Skia canvases.
-function LiquidSlot({ index, color, slotH, width, height }: SlotProps) {
+function LiquidSlot({ index, color, slotH, width, height, pad }: SlotProps) {
   const fill = useSharedValue(color ? 1 : 0);
   // Keep the last color so a draining layer doesn't turn transparent mid-animation
   const lastColor = useRef(color ?? "transparent");
@@ -47,15 +47,15 @@ function LiquidSlot({ index, color, slotH, width, height }: SlotProps) {
   }, [color, fill]);
 
   const y = useDerivedValue(
-    () => height - PAD - slotH * index - slotH * fill.value,
+    () => height - pad - slotH * index - slotH * fill.value,
   );
   const h = useDerivedValue(() => slotH * fill.value);
 
   return (
     <Rect
-      x={PAD}
+      x={pad}
       y={y}
-      width={width - PAD * 2}
+      width={width - pad * 2}
       height={h}
       color={lastColor.current}
     />
@@ -77,12 +77,20 @@ export function LiquidTube({
   height,
   onPress,
 }: Props) {
-  const slotH = (height - PAD * 2) / CAPACITY;
+  const { s } = useResponsive();
+  const pad = s(6);
+  const tubeRadius = s(radius.md);
+  const innerRadius = s(radius.sm);
+  const slotH = (height - pad * 2) / CAPACITY;
   const lift = useSharedValue(0);
+  const responsiveStyles = StyleSheet.create({
+    tube: { width, height },
+    canvas: { width, height },
+  });
 
   // Selected tubes hop up so the player can see what is picked
   useEffect(() => {
-    lift.value = withSpring(selected ? -22 : 0, {
+    lift.value = withSpring(selected ? -s(22) : 0, {
       damping: 18,
       stiffness: 220,
     });
@@ -93,7 +101,7 @@ export function LiquidTube({
   }));
 
   return (
-    <Animated.View style={[{ width, height }, liftStyle]}>
+    <Animated.View style={[responsiveStyles.tube, liftStyle]}>
       <PressableScale
         onPress={onPress}
         haptic={false}
@@ -101,23 +109,23 @@ export function LiquidTube({
         style={styles.fill}
       >
         <View pointerEvents="none" style={styles.fill}>
-          <Canvas style={{ width, height }}>
+          <Canvas style={responsiveStyles.canvas}>
             {/* Glass background */}
             <RoundedRect
               x={0}
               y={0}
               width={width}
               height={height}
-              r={18}
+              r={tubeRadius}
               color={colors.bgSoft}
             />
 
             {/* Liquid, clipped to the tube shape */}
             <Group
               clip={rrect(
-                rect(PAD, PAD, width - PAD * 2, height - PAD * 2),
-                14,
-                14,
+                rect(pad, pad, width - pad * 2, height - pad * 2),
+                innerRadius,
+                innerRadius,
               )}
             >
               {Array.from({ length: CAPACITY }, (_, i) => (
@@ -128,26 +136,27 @@ export function LiquidTube({
                   slotH={slotH}
                   width={width}
                   height={height}
+                  pad={pad}
                 />
               ))}
             </Group>
 
             {/* Glass shine and outline on top */}
             <Rect
-              x={PAD + 5}
-              y={PAD + 10}
-              width={4}
-              height={height - PAD * 2 - 24}
+              x={pad + s(5)}
+              y={pad + s(10)}
+              width={s(4)}
+              height={height - pad * 2 - s(24)}
               color="rgba(255,255,255,0.14)"
             />
             <RoundedRect
-              x={1.5}
-              y={1.5}
-              width={width - 3}
-              height={height - 3}
-              r={18}
+              x={s(1.5)}
+              y={s(1.5)}
+              width={width - s(3)}
+              height={height - s(3)}
+              r={tubeRadius}
               style="stroke"
-              strokeWidth={3}
+              strokeWidth={s(3)}
               color={selected ? colors.yellow : colors.cardBorder}
             />
           </Canvas>

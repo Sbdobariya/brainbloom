@@ -1,5 +1,6 @@
 import { PressableScale } from "@/core/components/PressableScale";
 import { colors, radius, spacing, typography } from "@/core/theme";
+import { useResponsive } from "@/core/theme/responsive";
 import { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -14,13 +15,32 @@ import Animated, {
 export type OptionState = "idle" | "correct" | "wrong" | "hidden" | "dimmed";
 
 type Props = {
+  width: number;
   letter: string;
   label: string;
   state: OptionState;
   onPress: () => void;
 };
 
-export function OptionButton({ letter, label, state, onPress }: Props) {
+export function OptionButton({ width, letter, label, state, onPress }: Props) {
+  const { s } = useResponsive();
+  const responsiveStyles = StyleSheet.create({
+    wrapper: { width },
+    button: {
+      minHeight: Math.max(48, s(72)),
+      gap: s(spacing.md),
+      paddingHorizontal: s(spacing.md),
+      borderWidth: s(2),
+      borderRadius: s(radius.lg),
+    },
+    badge: {
+      width: s(32),
+      height: s(32),
+      borderRadius: s(radius.sm),
+    },
+    badgeText: { fontSize: s(typography.caption.fontSize) },
+    label: { fontSize: s(typography.heading.fontSize) },
+  });
   const shake = useSharedValue(0);
   const pop = useSharedValue(1);
   const fade = useSharedValue(1);
@@ -65,14 +85,24 @@ export function OptionButton({ letter, label, state, onPress }: Props) {
 
   return (
     <Animated.View
-      style={[styles.wrapper, style]}
+      style={[responsiveStyles.wrapper, style]}
       pointerEvents={state === "idle" ? "auto" : "none"}
     >
-      <PressableScale onPress={onPress} style={[styles.button, stateStyle]}>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{letter}</Text>
+      <PressableScale
+        onPress={onPress}
+        style={[styles.button, responsiveStyles.button, stateStyle]}
+      >
+        <View style={[styles.badge, responsiveStyles.badge]}>
+          <Text style={[styles.badgeText, responsiveStyles.badgeText]}>
+            {letter}
+          </Text>
         </View>
-        <Text style={styles.label} numberOfLines={2}>
+        <Text
+          style={[styles.label, responsiveStyles.label]}
+          numberOfLines={2}
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+        >
           {label}
         </Text>
       </PressableScale>
@@ -81,17 +111,12 @@ export function OptionButton({ letter, label, state, onPress }: Props) {
 }
 
 const styles = StyleSheet.create({
-  wrapper: { width: "48%" },
+  wrapper: {},
   button: {
-    minHeight: 72,
     flexDirection: "row",
     alignItems: "center",
-    gap: spacing.md,
-    paddingHorizontal: spacing.md,
     backgroundColor: colors.card,
     borderColor: colors.cardBorder,
-    borderWidth: 2,
-    borderRadius: radius.lg,
   },
   correct: {
     borderColor: colors.green,
@@ -102,12 +127,9 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,159,28,0.18)",
   },
   badge: {
-    width: 32,
-    height: 32,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.bgSoft,
-    borderRadius: radius.sm,
   },
   badgeText: { ...typography.caption, color: colors.textMuted },
   label: { ...typography.heading, color: colors.text, flex: 1 },
