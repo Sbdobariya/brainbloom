@@ -9,24 +9,24 @@
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		6D7326AFF2BDA8938ECF61FA /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A2A4BFC213BB4CB47B9B39FF /* PrivacyInfo.xcprivacy */; };
-		ACB2FDF50414863FF2DE5446 /* libPods-BrainBloom.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 91D8A2C32BA6DD444D3C21CC /* libPods-BrainBloom.a */; };
+		462E191B92D71BEA053BDC6F /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FE5AC40EC412FB5CAD8E04E /* ExpoModulesProvider.swift */; };
+		68520E07C8502A0F2499A41E /* libPods-BrainBloom.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 473174B04E785023C9EB4023 /* libPods-BrainBloom.a */; };
+		989E3D7D86B9B598FB4749C6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C30CCDF433F38A4807995747 /* PrivacyInfo.xcprivacy */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
-		F7964AC1BC81329694059A5C /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 611852152CBA0B3D06E3EF7C /* ExpoModulesProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		004C65293FE02BB82DCB0D67 /* Pods-BrainBloom.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BrainBloom.release.xcconfig"; path = "Target Support Files/Pods-BrainBloom/Pods-BrainBloom.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* BrainBloom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrainBloom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = BrainBloom/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = BrainBloom/Info.plist; sourceTree = "<group>"; };
-		611852152CBA0B3D06E3EF7C /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-BrainBloom/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		91D8A2C32BA6DD444D3C21CC /* libPods-BrainBloom.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BrainBloom.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A2A4BFC213BB4CB47B9B39FF /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = BrainBloom/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		18AE8CCD40C4B3A887598DBE /* Pods-BrainBloom.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BrainBloom.debug.xcconfig"; path = "Target Support Files/Pods-BrainBloom/Pods-BrainBloom.debug.xcconfig"; sourceTree = "<group>"; };
+		473174B04E785023C9EB4023 /* libPods-BrainBloom.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BrainBloom.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4744F985E640EF48594229AF /* Pods-BrainBloom.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BrainBloom.release.xcconfig"; path = "Target Support Files/Pods-BrainBloom/Pods-BrainBloom.release.xcconfig"; sourceTree = "<group>"; };
+		8FE5AC40EC412FB5CAD8E04E /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-BrainBloom/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = BrainBloom/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
-		C2FA49C7FC591AA6147E6C36 /* Pods-BrainBloom.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BrainBloom.debug.xcconfig"; path = "Target Support Files/Pods-BrainBloom/Pods-BrainBloom.debug.xcconfig"; sourceTree = "<group>"; };
+		C30CCDF433F38A4807995747 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = BrainBloom/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = BrainBloom/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* BrainBloom-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "BrainBloom-Bridging-Header.h"; path = "BrainBloom/BrainBloom-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ACB2FDF50414863FF2DE5446 /* libPods-BrainBloom.a in Frameworks */,
+				68520E07C8502A0F2499A41E /* libPods-BrainBloom.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,7 +53,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				A2A4BFC213BB4CB47B9B39FF /* PrivacyInfo.xcprivacy */,
+				C30CCDF433F38A4807995747 /* PrivacyInfo.xcprivacy */,
 			);
 			name = BrainBloom;
 			sourceTree = "<group>";
@@ -62,24 +62,25 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				91D8A2C32BA6DD444D3C21CC /* libPods-BrainBloom.a */,
+				473174B04E785023C9EB4023 /* libPods-BrainBloom.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		3DBC18350B0BC7F003EB06CA /* Pods */ = {
+		3E8E28F1263F06AB820BCA7F /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				C2FA49C7FC591AA6147E6C36 /* Pods-BrainBloom.debug.xcconfig */,
-				004C65293FE02BB82DCB0D67 /* Pods-BrainBloom.release.xcconfig */,
+				18AE8CCD40C4B3A887598DBE /* Pods-BrainBloom.debug.xcconfig */,
+				4744F985E640EF48594229AF /* Pods-BrainBloom.release.xcconfig */,
 			);
+			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		4642EAA6C51510B351B0E9B5 /* BrainBloom */ = {
+		64398A9F4203EE48AA1E3AAD /* BrainBloom */ = {
 			isa = PBXGroup;
 			children = (
-				611852152CBA0B3D06E3EF7C /* ExpoModulesProvider.swift */,
+				8FE5AC40EC412FB5CAD8E04E /* ExpoModulesProvider.swift */,
 			);
 			name = BrainBloom;
 			sourceTree = "<group>";
@@ -98,8 +99,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				3DBC18350B0BC7F003EB06CA /* Pods */,
-				874AD64C97D9724FA3A24F44 /* ExpoModulesProviders */,
+				3E8E28F1263F06AB820BCA7F /* Pods */,
+				A2E7D933A171BF816B46247E /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -114,10 +115,10 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		874AD64C97D9724FA3A24F44 /* ExpoModulesProviders */ = {
+		A2E7D933A171BF816B46247E /* ExpoModulesProviders */ = {
 			isa = PBXGroup;
 			children = (
-				4642EAA6C51510B351B0E9B5 /* BrainBloom */,
+				64398A9F4203EE48AA1E3AAD /* BrainBloom */,
 			);
 			name = ExpoModulesProviders;
 			sourceTree = "<group>";
@@ -139,13 +140,13 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "BrainBloom" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				2E6D957E7E495A9F3263AAC1 /* [Expo] Configure project */,
+				2D28B55FC714C13BB0DC2F98 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				AE3D27A7EF1177AC6804AB86 /* [CP] Embed Pods Frameworks */,
+				E3EC1123E7C358EA1449B58A /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -195,7 +196,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				6D7326AFF2BDA8938ECF61FA /* PrivacyInfo.xcprivacy in Resources */,
+				989E3D7D86B9B598FB4749C6 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,7 +242,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		2E6D957E7E495A9F3263AAC1 /* [Expo] Configure project */ = {
+		2D28B55FC714C13BB0DC2F98 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -301,7 +302,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BrainBloom/Pods-BrainBloom-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		AE3D27A7EF1177AC6804AB86 /* [CP] Embed Pods Frameworks */ = {
+		E3EC1123E7C358EA1449B58A /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -353,7 +354,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				F7964AC1BC81329694059A5C /* ExpoModulesProvider.swift in Sources */,
+				462E191B92D71BEA053BDC6F /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,13 +363,12 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C2FA49C7FC591AA6147E6C36 /* Pods-BrainBloom.debug.xcconfig */;
+			baseConfigurationReference = 18AE8CCD40C4B3A887598DBE /* Pods-BrainBloom.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = BrainBloom/BrainBloom.entitlements;
-				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = NN75S37RS5;
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -400,13 +400,12 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 004C65293FE02BB82DCB0D67 /* Pods-BrainBloom.release.xcconfig */;
+			baseConfigurationReference = 4744F985E640EF48594229AF /* Pods-BrainBloom.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = BrainBloom/BrainBloom.entitlements;
-				CURRENT_PROJECT_VERSION = 2;
-				DEVELOPMENT_TEAM = NN75S37RS5;
+				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = BrainBloom/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
