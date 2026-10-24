@@ -1,1 +1,1 @@
-export const PRIVACY_URL = "https://example.com/brainbloom/privacy";
+export const PRIVACY_URL = "https://brainbloom-site.web.app/privacy.html";
