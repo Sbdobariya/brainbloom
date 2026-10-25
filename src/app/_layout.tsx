@@ -1,3 +1,4 @@
+import { initAds } from "@/core/ads";
 import { AnimatedSplash, ParentalGate } from "@/core/components";
 import {
   Fredoka_500Medium,
@@ -18,6 +19,14 @@ import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync();
+
+function AdsInitializer() {
+  useEffect(() => {
+    void initAds();
+  }, []);
+
+  return null;
+}
 
 export default function RootLayout() {
   const [splashDone, setSplashDone] = useState(false);
@@ -44,6 +53,7 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
+        {fontsLoaded && <AdsInitializer />}
         <Stack screenOptions={{ headerShown: false }} />
         <ParentalGate />
         {!splashDone && <AnimatedSplash onDone={() => setSplashDone(true)} />}

@@ -21,6 +21,7 @@ Kids education + brain games mobile app (React Native, Expo).
 - Do not use AsyncStorage. Use MMKV.
 - Kids app: minimum touch target 56px, no external links or ads without a parental gate, no personal data collection.
 - Any link that leaves the app, and any purchase, must go through `useGate.getState().request(...)`.
+- Import `react-native-google-mobile-ads` only from `src/core/ads/index.android.tsx`.
 - Never add a dependency without telling me first.
 - Keep files small. One component per file.
 

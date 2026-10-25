@@ -1,7 +1,8 @@
+import { adBreak, noteGameCompleted } from "@/core/ads";
 import { colors, radius, spacing, typography } from "@/core/theme";
 import { useResponsive } from "@/core/theme/responsive";
 import LottieView from "lottie-react-native";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
@@ -21,6 +22,7 @@ type Props = {
   onExit: () => void;
   playAgainLabel?: string;
   stars?: number;
+  ads?: boolean;
 };
 
 const animations = {
@@ -37,6 +39,7 @@ export function ResultModal({
   onExit,
   playAgainLabel = "Play again",
   stars,
+  ads = false,
 }: Props) {
   const { height, width, s } = useResponsive();
   const responsiveStyles = StyleSheet.create({
@@ -60,6 +63,15 @@ export function ResultModal({
   });
   const backdrop = useSharedValue(0);
   const card = useSharedValue(0);
+  const gameCompletionNoted = useRef(false);
+  const actionBusy = useRef(false);
+
+  useEffect(() => {
+    if (ads && !gameCompletionNoted.current) {
+      gameCompletionNoted.current = true;
+      noteGameCompleted();
+    }
+  }, [ads]);
 
   // Runs once when the modal mounts: fade the backdrop, then spring the card in
   useEffect(() => {
@@ -72,6 +84,17 @@ export function ResultModal({
     opacity: card.value,
     transform: [{ scale: 0.7 + card.value * 0.3 }],
   }));
+
+  const runAction = async (callback: () => void) => {
+    if (actionBusy.current) return;
+    actionBusy.current = true;
+    try {
+      if (ads) await adBreak();
+      callback();
+    } finally {
+      actionBusy.current = false;
+    }
+  };
 
   return (
     <Animated.View
@@ -114,9 +137,12 @@ export function ResultModal({
           ) : null}
           {stars !== undefined && <StarsRow stars={stars} />}
           <View style={[styles.actions, responsiveStyles.actions]}>
-            <GradientButton label={playAgainLabel} onPress={onPlayAgain} />
+            <GradientButton
+              label={playAgainLabel}
+              onPress={() => void runAction(onPlayAgain)}
+            />
             <PressableScale
-              onPress={onExit}
+              onPress={() => void runAction(onExit)}
               sound
               style={[styles.exit, responsiveStyles.exit]}
             >

@@ -292,6 +292,7 @@ export function FreeFlowGame() {
                 }}
                 onExit={() => router.back()}
                 stars={stars}
+                ads
               />
             )}
           </>

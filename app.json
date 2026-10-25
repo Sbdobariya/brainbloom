@@ -21,7 +21,10 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "app.brainbloom.kids",
-      "blockedPermissions": ["android.permission.RECORD_AUDIO"]
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "com.google.android.gms.permission.AD_ID"
+      ]
     },
     "web": {
       "output": "static",
@@ -49,6 +52,13 @@
           "ios": {
             "enableSceneSupport": true
           }
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-5263412216348985~3934116310",
+          "iosAppId": "ca-app-pub-5263412216348985~4269866073"
         }
       ],
       "expo-font"

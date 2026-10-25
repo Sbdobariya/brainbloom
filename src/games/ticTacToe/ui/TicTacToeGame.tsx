@@ -225,6 +225,7 @@ export function TicTacToeGame() {
             onPlayAgain={newRound}
             onExit={() => router.back()}
             stars={stars}
+            ads
           />
         )}
       </GameScreen>

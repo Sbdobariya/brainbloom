@@ -291,6 +291,7 @@ export function QuizGame() {
             onPlayAgain={restart}
             onExit={() => router.back()}
             stars={stars}
+            ads
           />
         )}
       </GameScreen>

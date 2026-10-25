@@ -245,6 +245,7 @@ export function WaterSortGame() {
                 }}
                 onExit={() => router.back()}
                 stars={stars}
+                ads
               />
             )}
           </>

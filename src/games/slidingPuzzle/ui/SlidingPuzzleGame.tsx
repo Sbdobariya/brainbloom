@@ -252,6 +252,7 @@ export function SlidingPuzzleGame() {
             onPlayAgain={() => startNew()}
             onExit={() => router.back()}
             stars={stars}
+            ads
           />
         )}
       </GameScreen>

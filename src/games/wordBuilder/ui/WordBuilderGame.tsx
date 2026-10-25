@@ -265,6 +265,7 @@ export function WordBuilderGame() {
             onPlayAgain={restart}
             onExit={() => router.back()}
             stars={stars}
+            ads
           />
         )}
       </GameScreen>
